@@ -62,7 +62,7 @@
                     <Button Content="Nettoyer" Style="{StaticResource PrimaryButton}" Command="{Binding CleanCommand}" />
                 </StackPanel>
 
-                <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Margin="0,14,0,0" Value="{Binding Progress}" Maximum="100"
+                <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Margin="0,14,0,0" Value="{Binding Progress, Mode=OneWay}" Maximum="100"
                              Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
             </Grid>
         </Border>
