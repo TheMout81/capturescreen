@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RootNamespace>PureClean</RootNamespace>
+    <AssemblyName>PureClean</AssemblyName>
+    <Version>1.0.0</Version>
+    <Product>PureClean</Product>
+    <Description>Nettoyeur Windows libre, sans publicité, sans abonnement, sans télémétrie.</Description>
+    <!-- Permet de compiler (pas d'exécuter) depuis Linux/macOS. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Non importé par défaut dans les projets WPF. -->
+    <Using Include="System.IO" />
+  </ItemGroup>
+
+</Project>

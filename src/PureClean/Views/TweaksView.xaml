@@ -1,0 +1,85 @@
+<UserControl x:Class="PureClean.Views.TweaksView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PureClean.ViewModels">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock Text="Réglages Windows" Style="{StaticResource PageTitle}" />
+            <TextBlock Style="{StaticResource PageSubtitle}"
+                       Text="Optimisations de confidentialité et de réactivité. Chaque réglage est réversible : décochez-le puis appliquez pour revenir au comportement d'origine de Windows." />
+        </StackPanel>
+
+        <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,20,0,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{Binding StatusText}" Style="{StaticResource ItemDescription}" Margin="0,0,0,8" />
+                    <CheckBox Style="{StaticResource CheckBoxModern}" IsChecked="{Binding CreateRestorePoint}">
+                        <TextBlock Text="Créer un point de restauration système avant d'appliquer (recommandé)" FontSize="12" />
+                    </CheckBox>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="Point de restauration" Style="{StaticResource SecondaryButton}" Command="{Binding RestorePointCommand}" />
+                    <Button Content="Recharger" Style="{StaticResource SecondaryButton}" Command="{Binding ReloadCommand}" />
+                    <Button Content="Appliquer" Style="{StaticResource PrimaryButton}" Command="{Binding ApplyCommand}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,0,-16,0" Padding="0,0,16,0">
+            <ItemsControl ItemsSource="{Binding Groups}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:TweakGroupViewModel}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Name}" Style="{StaticResource SectionTitle}" />
+                            <ItemsControl ItemsSource="{Binding Items}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:TweakItemViewModel}">
+                                        <Border Style="{StaticResource Row}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding IsChecked}" Margin="0,0,16,0" />
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock Text="{Binding Name}" Style="{StaticResource ItemTitle}" />
+                                                    <TextBlock Text="{Binding Description}" Style="{StaticResource ItemDescription}" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="16,0,0,0">
+                                                    <Border Style="{StaticResource Badge}" Background="{StaticResource WarningSoftBrush}"
+                                                            Visibility="{Binding IsModified, Converter={StaticResource BoolToVisibility}}">
+                                                        <TextBlock Text="Non appliqué" FontSize="11" Foreground="{StaticResource WarningBrush}" />
+                                                    </Border>
+                                                    <Border Style="{StaticResource Badge}" Background="{StaticResource SuccessSoftBrush}"
+                                                            Visibility="{Binding IsApplied, Converter={StaticResource BoolToVisibility}}">
+                                                        <TextBlock Text="Actif" FontSize="11" Foreground="{StaticResource SuccessBrush}" />
+                                                    </Border>
+                                                    <Border Style="{StaticResource Badge}" Background="{StaticResource BackgroundBrush}"
+                                                            Visibility="{Binding RequiresRestart, Converter={StaticResource BoolToVisibility}}">
+                                                        <TextBlock Text="Redémarrage" FontSize="11" Foreground="{StaticResource MutedTextBrush}"
+                                                                   ToolTip="Pris en compte après redémarrage ou reconnexion" />
+                                                    </Border>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
