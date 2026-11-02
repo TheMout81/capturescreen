@@ -11,7 +11,7 @@
         <StackPanel>
             <TextBlock Text="Logiciels" Style="{StaticResource PageTitle}" />
             <TextBlock Style="{StaticResource PageSubtitle}"
-                       Text="Installez et mettez à jour vos logiciels en un clic, sans publicité ni logiciel ajouté. Cette page utilise Internet via winget, l'outil officiel de Microsoft (et GitHub pour RustDesk)." />
+                       Text="Installez et mettez à jour vos logiciels en un clic, sans publicité ni logiciel ajouté. Cette page utilise Internet via winget, l'outil officiel de Microsoft (et la page GitHub officielle pour RustDesk et ArtCraft Launcher)." />
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,16,0,12">

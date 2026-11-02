@@ -56,6 +56,12 @@ public sealed class AppSettings
 
     public RustDeskSettings RustDesk { get; set; } = new();
 
+    /// <summary>
+    /// Identifiants de la liste par défaut déjà proposés : les logiciels ajoutés par une nouvelle version
+    /// de PureClean sont ajoutés à la liste enregistrée, sans faire revenir ceux que l'utilisateur a retirés.
+    /// </summary>
+    public List<string>? KnownCatalogIds { get; set; }
+
     public void Save()
     {
         lock (Gate)

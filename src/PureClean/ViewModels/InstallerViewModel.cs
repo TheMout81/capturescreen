@@ -28,6 +28,11 @@ public sealed class SoftwareItemViewModel : ObservableObject
     public string Id => Entry.Id;
     public bool IsRustDesk => Entry.ToPackage().IsRustDesk;
 
+    /// <summary>Logiciel installé depuis sa page GitHub officielle (absent de winget).</summary>
+    public GitHubApp? GitHubApp => Entry.Source == SoftwareCatalog.GitHubSource
+        ? SoftwareCatalog.GitHubApps.GetValueOrDefault(Entry.Id)
+        : null;
+
     public string Details => Entry.Source switch
     {
         SoftwareCatalog.StoreSource => Entry.Id + " · Microsoft Store",
@@ -96,7 +101,7 @@ public sealed class InstallerViewModel : ObservableObject
         OpenStoreCommand = new RelayCommand(() => Process.Start(new ProcessStartInfo(AppInstallerStorePage) { UseShellExecute = true }));
         ApplyRustDeskCommand = new AsyncRelayCommand(ApplyRustDeskAsync, () => !IsBusy && _settings.RustDesk.IsConfigured);
 
-        LoadItems(_settings.SoftwareList ?? DefaultEntries());
+        LoadItems(_settings.SoftwareList is { } saved ? WithNewDefaults(saved) : DefaultEntries());
     }
 
     public ObservableCollection<SoftwareCategoryViewModel> Categories { get; } = [];
@@ -199,6 +204,28 @@ public sealed class InstallerViewModel : ObservableObject
     private static List<SoftwareEntry> DefaultEntries()
         => SoftwareCatalog.Default.Select(p => SoftwareEntry.From(p, selected: false)).ToList();
 
+    /// <summary>
+    /// Ajoute à une liste enregistrée les logiciels apparus dans la liste par défaut depuis,
+    /// sans faire revenir ceux que l'utilisateur avait retirés.
+    /// </summary>
+    private List<SoftwareEntry> WithNewDefaults(List<SoftwareEntry> saved)
+    {
+        var known = new HashSet<string>(_settings.KnownCatalogIds ?? [], StringComparer.OrdinalIgnoreCase);
+        var present = new HashSet<string>(saved.Select(e => e.Id), StringComparer.OrdinalIgnoreCase);
+        var added = SoftwareCatalog.Default
+            .Where(p => !known.Contains(p.Id) && !present.Contains(p.Id))
+            .Select(p => SoftwareEntry.From(p, selected: false))
+            .ToList();
+
+        _settings.KnownCatalogIds = SoftwareCatalog.Default.Select(p => p.Id).ToList();
+        if (added.Count > 0)
+        {
+            saved.AddRange(added);
+            _settings.Save();
+        }
+        return saved;
+    }
+
     private void LoadItems(IEnumerable<SoftwareEntry> entries)
     {
         _items = entries
@@ -241,8 +268,8 @@ public sealed class InstallerViewModel : ObservableObject
     {
         foreach (var item in _items)
         {
-            item.IsInstalled = item.IsRustDesk
-                ? RustDeskInstaller.IsInstalled
+            item.IsInstalled = item.Entry.Source == SoftwareCatalog.GitHubSource
+                ? item.GitHubApp?.IsInstalled == true
                 : SoftwareCatalog.IsInstalled(item.Id, _installedIds);
         }
         OnPropertyChanged(nameof(SelectionText));
@@ -257,7 +284,7 @@ public sealed class InstallerViewModel : ObservableObject
             WingetMissing = !await WingetClient.IsAvailableAsync();
             if (WingetMissing)
             {
-                StatusText = "winget n'est pas disponible : seul RustDesk peut être installé pour l'instant.";
+                StatusText = "winget n'est pas disponible : seuls RustDesk et ArtCraft Launcher peuvent être installés pour l'instant.";
                 ApplyInstalledState();
                 return;
             }
@@ -285,7 +312,7 @@ public sealed class InstallerViewModel : ObservableObject
             MessageBox.Show("Tous les logiciels cochés sont déjà installés.", AppInfo.Title, MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
-        if (WingetMissing && targets.Any(t => !t.IsRustDesk))
+        if (WingetMissing && targets.Any(t => t.Entry.Source != SoftwareCatalog.GitHubSource))
         {
             MessageBox.Show("winget n'est pas disponible sur ce PC. Mettez à jour « Programme d'installation d'application » depuis le Microsoft Store, puis cliquez sur « Actualiser ».",
                 AppInfo.Title, MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -331,10 +358,16 @@ public sealed class InstallerViewModel : ObservableObject
     {
         try
         {
-            if (item.IsRustDesk)
+            if (item.Entry.Source == SoftwareCatalog.GitHubSource)
             {
-                await RustDeskInstaller.InstallAsync(_settings.RustDesk, new Progress<string>(s => item.Status = s));
-                item.Status = _settings.RustDesk.IsConfigured ? "Installé et configuré" : "Installé";
+                var app = item.GitHubApp ?? throw new InvalidOperationException("logiciel GitHub inconnu de cette version de PureClean");
+                var progress = new Progress<string>(text => item.Status = text);
+                if (item.IsRustDesk)
+                    await RustDeskInstaller.InstallAsync(app, _settings.RustDesk, progress);
+                else
+                    await GitHubReleaseInstaller.InstallAsync(app, progress);
+
+                item.Status = item.IsRustDesk && _settings.RustDesk.IsConfigured ? "Installé et configuré" : "Installé";
                 return true;
             }
 

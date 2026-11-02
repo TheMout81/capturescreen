@@ -3,7 +3,7 @@
 Nettoyeur et optimiseur pour Windows 10 / 11, dans l'esprit de CCleaner, **sans publicité, sans abonnement et sans télémétrie**.
 
 - Aucune dépendance externe : uniquement .NET 8 et les API de Windows.
-- PureClean n'envoie aucune donnée. Seule la page « Logiciels » utilise Internet, via winget (l'outil officiel de Microsoft) et GitHub pour RustDesk, et uniquement quand vous le demandez.
+- PureClean n'envoie aucune donnée. Seule la page « Logiciels » utilise Internet, via winget (l'outil officiel de Microsoft) et les pages GitHub officielles de RustDesk et d'ArtCraft Launcher, et uniquement quand vous le demandez.
 - Pas de « version Pro », pas de programme résident, pas de mise à jour forcée.
 - Thème clair, sombre ou selon Windows.
 
@@ -35,10 +35,11 @@ Logiciels installés, avec recherche et tri par nom, taille ou date. La désinst
 ### Logiciels
 Installation et mise à jour de logiciels en un clic, à la manière de Ninite, via winget :
 
-- **Installer** : environ 50 logiciels courants classés par catégorie, à cocher. Les logiciels déjà installés sont repérés. L'installation est automatique et silencieuse (réglages par défaut de l'éditeur, sans offre ni logiciel ajouté). Les installateurs proviennent des éditeurs et sont vérifiés par empreinte SHA-256.
+- **Installer** : plus de 50 logiciels courants classés par catégorie (dont une section Sauvegarde : Kopia, Duplicati, restic), à cocher. Les logiciels déjà installés sont repérés. L'installation est automatique et silencieuse (réglages par défaut de l'éditeur, sans offre ni logiciel ajouté). Les installateurs proviennent des éditeurs et sont vérifiés par empreinte SHA-256.
 - **Liste modifiable** : recherche dans tout le catalogue winget et le Microsoft Store pour ajouter un logiciel, retrait d'un logiciel, retour à la liste par défaut.
 - **Profils** : « Exporter la sélection » enregistre votre liste dans un fichier ; sur un Windows neuf, « Importer un profil » puis « Installer la sélection » réinstalle tout. « Créer un profil depuis ce PC » coche les logiciels déjà présents (idéal avant une réinstallation). Les fichiers de `winget export` sont aussi acceptés.
-- **RustDesk** (absent de winget) est téléchargé depuis sa page GitHub officielle, avec vérification de l'empreinte. La configuration de votre serveur auto-hébergé est appliquée automatiquement, soit par la chaîne exportée depuis RustDesk, soit par le serveur ID, le relais et la clé. Elle est enregistrée dans vos profils.
+- **RustDesk** et **ArtCraft Launcher** (absents de winget) sont téléchargés depuis leur page GitHub officielle. L'empreinte SHA-256 est vérifiée (celle publiée par GitHub, ou à défaut le fichier `SHA256SUMS.txt` de la version) ; sans empreinte, rien n'est installé. ArtCraft Launcher installe ensuite et tient à jour les applications ArtCraft (FilmCraft, CadCraft…).
+- **RustDesk**, en plus : la configuration de votre serveur auto-hébergé est appliquée automatiquement, soit par la chaîne exportée depuis RustDesk, soit par le serveur ID, le relais et la clé. Elle est enregistrée dans vos profils.
 - **Mises à jour** : liste des logiciels ayant une nouvelle version, avec un bouton par logiciel et **Tout mettre à jour**.
 
 Chaque identifiant de la liste par défaut a été vérifié dans le dépôt officiel `microsoft/winget-pkgs`. Les logiciels dont l'installateur embarque des offres publicitaires en ont été retirés par Microsoft (FileZilla, par exemple) ; WinSCP le remplace.
