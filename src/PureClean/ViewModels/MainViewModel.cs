@@ -14,12 +14,14 @@ public sealed class MainViewModel : ObservableObject
         var cleaner = new CleanerViewModel();
         Startup = new StartupViewModel();
         Home = new HomeViewModel(cleaner, Navigate, Startup);
+        Programs = new ProgramsViewModel();
 
         NavigationItems =
         [
             new("Accueil", "\uE80F", Home),
             new("Nettoyage", "\uE74D", cleaner),
             new("Analyse disque", "\uEDA2", new DiskAnalyzerViewModel()),
+            new("Programmes", "\uE71D", Programs),
             new("Démarrage", "\uE7E8", Startup),
             new("Réglages Windows", "\uE90F", new TweaksViewModel()),
             new("Paramètres", "\uE713", new SettingsViewModel()),
@@ -35,6 +37,8 @@ public sealed class MainViewModel : ObservableObject
 
     public StartupViewModel Startup { get; }
 
+    public ProgramsViewModel Programs { get; }
+
     public NavigationItem SelectedItem
     {
         get => _selectedItem;
@@ -46,9 +50,11 @@ public sealed class MainViewModel : ObservableObject
             if (value.Page == Home)
                 Home.Refresh();
 
-            // La liste de démarrage n'est chargée qu'à la première visite.
+            // Ces listes ne sont chargées qu'à la première visite.
             if (value.Page == Startup && Startup.Items.Count == 0 && Startup.RefreshCommand.CanExecute(null))
                 Startup.RefreshCommand.Execute(null);
+            if (value.Page == Programs && !Programs.IsLoaded && Programs.RefreshCommand.CanExecute(null))
+                Programs.RefreshCommand.Execute(null);
         }
     }
 
