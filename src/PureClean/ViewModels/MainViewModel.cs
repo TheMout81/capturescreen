@@ -17,11 +17,12 @@ public sealed class MainViewModel : ObservableObject
 
         NavigationItems =
         [
-            new("Accueil", "", Home),
-            new("Nettoyage", "", cleaner),
-            new("Démarrage", "", Startup),
-            new("Réglages Windows", "", new TweaksViewModel()),
-            new("Paramètres", "", new SettingsViewModel()),
+            new("Accueil", "\uE80F", Home),
+            new("Nettoyage", "\uE74D", cleaner),
+            new("Analyse disque", "\uEDA2", new DiskAnalyzerViewModel()),
+            new("Démarrage", "\uE7E8", Startup),
+            new("Réglages Windows", "\uE90F", new TweaksViewModel()),
+            new("Paramètres", "\uE713", new SettingsViewModel()),
         ];
         _selectedItem = NavigationItems[0];
         Home.Refresh();
