@@ -57,17 +57,17 @@
                                                     <TextBlock Text="{Binding Description}" Style="{StaticResource ItemDescription}" />
                                                 </StackPanel>
                                                 <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="16,0,0,0">
-                                                    <Border Style="{StaticResource Badge}" Background="{StaticResource WarningSoftBrush}"
+                                                    <Border Style="{StaticResource Badge}" Background="{DynamicResource WarningSoftBrush}"
                                                             Visibility="{Binding IsModified, Converter={StaticResource BoolToVisibility}}">
-                                                        <TextBlock Text="Non appliqué" FontSize="11" Foreground="{StaticResource WarningBrush}" />
+                                                        <TextBlock Text="Non appliqué" FontSize="11" Foreground="{DynamicResource WarningBrush}" />
                                                     </Border>
-                                                    <Border Style="{StaticResource Badge}" Background="{StaticResource SuccessSoftBrush}"
+                                                    <Border Style="{StaticResource Badge}" Background="{DynamicResource SuccessSoftBrush}"
                                                             Visibility="{Binding IsApplied, Converter={StaticResource BoolToVisibility}}">
-                                                        <TextBlock Text="Actif" FontSize="11" Foreground="{StaticResource SuccessBrush}" />
+                                                        <TextBlock Text="Actif" FontSize="11" Foreground="{DynamicResource SuccessBrush}" />
                                                     </Border>
-                                                    <Border Style="{StaticResource Badge}" Background="{StaticResource BackgroundBrush}"
+                                                    <Border Style="{StaticResource Badge}" Background="{DynamicResource BackgroundBrush}"
                                                             Visibility="{Binding RequiresRestart, Converter={StaticResource BoolToVisibility}}">
-                                                        <TextBlock Text="Redémarrage" FontSize="11" Foreground="{StaticResource MutedTextBrush}"
+                                                        <TextBlock Text="Redémarrage" FontSize="11" Foreground="{DynamicResource MutedTextBrush}"
                                                                    ToolTip="Pris en compte après redémarrage ou reconnexion" />
                                                     </Border>
                                                 </StackPanel>

@@ -4,7 +4,7 @@
         xmlns:vm="clr-namespace:PureClean.ViewModels"
         Title="{Binding WindowTitle, Mode=OneWay}" Width="1100" Height="720" MinWidth="860" MinHeight="560"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource BackgroundBrush}"
+        Background="{DynamicResource BackgroundBrush}"
         FontFamily="Segoe UI" FontSize="13"
         TextOptions.TextFormattingMode="Display">
 
@@ -19,7 +19,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Barre latérale -->
-        <Grid Background="{StaticResource SidebarBrush}">
+        <Grid Background="{DynamicResource SidebarBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -28,14 +28,11 @@
 
             <StackPanel Margin="24,28,24,28">
                 <StackPanel Orientation="Horizontal">
-                    <Border Width="32" Height="32" CornerRadius="8" Background="{StaticResource AccentBrush}">
-                        <TextBlock Text="&#xE74D;" FontFamily="{StaticResource IconFont}" FontSize="16" Foreground="White"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
+                    <Image Source="/Resources/PureClean.png" Width="32" Height="32" RenderOptions.BitmapScalingMode="HighQuality" />
                     <TextBlock Text="PureClean" FontSize="20" FontWeight="SemiBold" Foreground="White"
                                VerticalAlignment="Center" Margin="10,0,0,0" />
                 </StackPanel>
-                <TextBlock Text="Sans pub · Sans abonnement · Sans télémétrie" Foreground="{StaticResource SidebarTextBrush}"
+                <TextBlock Text="Sans pub · Sans abonnement · Sans télémétrie" Foreground="{DynamicResource SidebarTextBrush}"
                            FontSize="11" TextWrapping="Wrap" Margin="0,10,0,0" />
             </StackPanel>
 
@@ -59,7 +56,7 @@
                     <TextBlock Text="Lancé sans droits administrateur : certains éléments ne pourront pas être nettoyés."
                                Foreground="#F8C77A" FontSize="11" TextWrapping="Wrap" />
                 </Border>
-                <TextBlock Foreground="{StaticResource SidebarTextBrush}" FontSize="11" TextWrapping="Wrap">
+                <TextBlock Foreground="{DynamicResource SidebarTextBrush}" FontSize="11" TextWrapping="Wrap">
                     <Run Text="100 % hors ligne — aucune donnée envoyée." />
                     <LineBreak />
                     <Run Text="{Binding Version, Mode=OneWay}" />

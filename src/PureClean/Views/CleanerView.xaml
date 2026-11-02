@@ -18,7 +18,7 @@
                             <TextBlock Text="{Binding Description}" Style="{StaticResource ItemDescription}" />
                         </StackPanel>
                     </CheckBox>
-                    <TextBlock Grid.Column="1" Text="{Binding ResultText}" Foreground="{StaticResource AccentBrush}"
+                    <TextBlock Grid.Column="1" Text="{Binding ResultText}" Foreground="{DynamicResource AccentBrush}"
                                FontWeight="SemiBold" VerticalAlignment="Center" Margin="16,0,0,0" />
                 </Grid>
             </Border>
@@ -51,7 +51,7 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="{Binding SummaryText}" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" />
+                    <TextBlock Text="{Binding SummaryText}" FontSize="22" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" />
                     <TextBlock Text="{Binding StatusText}" Style="{StaticResource ItemDescription}" />
                 </StackPanel>
 

@@ -8,6 +8,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Resources\PureClean.ico</ApplicationIcon>
     <RootNamespace>PureClean</RootNamespace>
     <AssemblyName>PureClean</AssemblyName>
     <Version>1.0.1</Version>
@@ -16,6 +17,10 @@
     <!-- Permet de compiler (pas d'exécuter) depuis Linux/macOS. -->
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\PureClean.png" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- Non importé par défaut dans les projets WPF. -->

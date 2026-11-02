@@ -14,9 +14,10 @@ public sealed class MainViewModel : ObservableObject
         Startup = new StartupViewModel();
         NavigationItems =
         [
-            new("Nettoyage", "", new CleanerViewModel()),
-            new("Démarrage", "", Startup),
-            new("Réglages Windows", "", new TweaksViewModel()),
+            new("Nettoyage", "\uE74D", new CleanerViewModel()),
+            new("Démarrage", "\uE7E8", Startup),
+            new("Réglages Windows", "\uE713", new TweaksViewModel()),
+            new("Paramètres", "\uE115", new SettingsViewModel()),
         ];
         _selectedItem = NavigationItems[0];
         IsAdministrator = CheckAdministrator();

@@ -40,8 +40,8 @@
                                     <TextBlock Text="{Binding Command}" Style="{StaticResource ItemDescription}"
                                                TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding Command}" />
                                 </StackPanel>
-                                <Border Grid.Column="2" Style="{StaticResource Badge}" Background="{StaticResource BackgroundBrush}" Margin="16,0,0,0">
-                                    <TextBlock Text="{Binding SourceLabel}" FontSize="11" Foreground="{StaticResource MutedTextBrush}" />
+                                <Border Grid.Column="2" Style="{StaticResource Badge}" Background="{DynamicResource BackgroundBrush}" Margin="16,0,0,0">
+                                    <TextBlock Text="{Binding SourceLabel}" FontSize="11" Foreground="{DynamicResource MutedTextBrush}" />
                                 </Border>
                             </Grid>
                         </Border>
