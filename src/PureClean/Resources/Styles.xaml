@@ -12,6 +12,7 @@
     <infra:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility" />
     <infra:EqualsConverter x:Key="Equals" />
     <infra:IsNotEmptyConverter x:Key="IsNotEmpty" />
+    <infra:IsNotEmptyToVisibilityConverter x:Key="IsNotEmptyToVisibility" />
 
     <!-- Textes -->
     <Style x:Key="PageTitle" TargetType="TextBlock">

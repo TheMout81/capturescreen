@@ -1,0 +1,257 @@
+<UserControl x:Class="PureClean.Views.SecurityView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PureClean.ViewModels"
+             xmlns:sec="clr-namespace:PureClean.Core.Security">
+
+    <UserControl.Resources>
+        <!-- Couleurs selon la gravité (Ok, Info, Warning, Danger) -->
+        <Style x:Key="SeverityBack" TargetType="Border">
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Width" Value="24" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Severity}" Value="Info">
+                    <Setter Property="Background" Value="{DynamicResource BackgroundBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Severity}" Value="Warning">
+                    <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Severity}" Value="Danger">
+                    <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="SeverityGlyph" TargetType="TextBlock" BasedOn="{StaticResource Glyph}">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Text" Value="{Binding Glyph}" />
+            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Severity}" Value="Info">
+                    <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Severity}" Value="Warning">
+                    <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Severity}" Value="Danger">
+                    <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock Text="Sécurité" Style="{StaticResource PageTitle}" />
+            <TextBlock Style="{StaticResource PageSubtitle}"
+                       Text="Pilote Microsoft Defender (maintenu par Microsoft), contrôle les réglages souvent détournés et propose des scanners reconnus en second avis. PureClean n'est pas un antivirus : la protection en temps réel reste assurée par Defender." />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,16,0,12">
+            <RadioButton Style="{StaticResource PillRadio}" GroupName="SecurityTab" Content="Protection"
+                         IsChecked="{Binding Tab, Converter={StaticResource Equals}, ConverterParameter=Protection}" />
+            <RadioButton Style="{StaticResource PillRadio}" GroupName="SecurityTab" Content="Bilan de sécurité"
+                         IsChecked="{Binding Tab, Converter={StaticResource Equals}, ConverterParameter=Audit}" />
+            <RadioButton Style="{StaticResource PillRadio}" GroupName="SecurityTab" Content="Second avis"
+                         IsChecked="{Binding Tab, Converter={StaticResource Equals}, ConverterParameter=SecondOpinion}" />
+        </StackPanel>
+
+        <!-- ============ Protection (Microsoft Defender) ============ -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,0,-16,0" Padding="0,0,16,0"
+                      Visibility="{Binding IsProtectionTab, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Content="Ouvrir Sécurité Windows" Style="{StaticResource LinkButton}" Command="{Binding OpenSecurityCenterCommand}"
+                                        VerticalAlignment="Center" />
+                                <Button Content="Actualiser" Style="{StaticResource SecondaryButton}" Command="{Binding RefreshCommand}" />
+                            </StackPanel>
+                            <TextBlock Text="Microsoft Defender" Style="{StaticResource ItemTitle}" VerticalAlignment="Center" />
+                        </DockPanel>
+                        <ItemsControl ItemsSource="{Binding StatusItems}" Margin="0,12,0,0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="3" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:StatusItem}">
+                                    <Border Style="{StaticResource Row}" Margin="0,0,6,6" Padding="10,8">
+                                        <DockPanel>
+                                            <Border DockPanel.Dock="Left" Style="{StaticResource SeverityBack}" Margin="0,0,10,0">
+                                                <TextBlock Style="{StaticResource SeverityGlyph}" />
+                                            </Border>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Label}" Style="{StaticResource ItemDescription}" Margin="0" />
+                                                <TextBlock Text="{Binding Value}" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}"
+                                                           TextWrapping="Wrap" />
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Card}" Margin="0,8,0,0">
+                    <StackPanel>
+                        <WrapPanel>
+                            <Button Content="Analyse rapide" Style="{StaticResource PrimaryButton}" Command="{Binding QuickScanCommand}" Margin="0,0,8,6" />
+                            <Button Content="Analyse complète" Style="{StaticResource SecondaryButton}" Command="{Binding FullScanCommand}" Margin="0,0,8,6" />
+                            <Button Content="Analyser un dossier…" Style="{StaticResource SecondaryButton}" Command="{Binding FolderScanCommand}" Margin="0,0,8,6" />
+                            <Button Content="Mettre à jour les signatures" Style="{StaticResource SecondaryButton}" Command="{Binding UpdateCommand}" Margin="0,0,8,6" />
+                            <Button Content="Analyse hors ligne…" Style="{StaticResource DangerButton}" Command="{Binding OfflineScanCommand}" Margin="0,0,8,6"
+                                    ToolTip="Redémarre le PC pour analyser avant le démarrage de Windows (menaces furtives)" />
+                        </WrapPanel>
+                        <TextBlock Text="{Binding StatusText}" Style="{StaticResource ItemDescription}" Margin="0,6,0,0" />
+                        <ProgressBar IsIndeterminate="True" Margin="0,10,0,0"
+                                     Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Text="MENACES DÉTECTÉES PAR DEFENDER" Style="{StaticResource SectionTitle}" />
+                <TextBlock Text="Aucune menace dans l'historique de Microsoft Defender." Style="{StaticResource ItemDescription}" Margin="4,0,0,16"
+                           Visibility="{Binding HasThreats, Converter={StaticResource InverseBoolToVisibility}}" />
+                <ItemsControl ItemsSource="{Binding Threats}" Margin="0,0,0,16">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type sec:ThreatRecord}">
+                            <Border Style="{StaticResource Row}">
+                                <DockPanel>
+                                    <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Margin="12,0,0,0">
+                                        <TextBlock Text="{Binding StatusLabel}" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" TextAlignment="Right" />
+                                        <TextBlock Text="{Binding Date, StringFormat='{}{0:d MMM yyyy HH:mm}'}" Style="{StaticResource ItemDescription}" TextAlignment="Right" />
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Style="{StaticResource ItemTitle}">
+                                            <Run Text="{Binding Name, Mode=OneWay}" />
+                                            <Run Text="{Binding SeverityLabel, Mode=OneWay, StringFormat='  · gravité {0}'}" FontWeight="Normal"
+                                                 Foreground="{DynamicResource MutedTextBrush}" FontSize="12" />
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Resources}" Style="{StaticResource ItemDescription}" TextWrapping="NoWrap"
+                                                   TextTrimming="CharacterEllipsis" ToolTip="{Binding Resources}" />
+                                    </StackPanel>
+                                </DockPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- ============ Bilan de sécurité ============ -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,0,-16,0" Padding="0,0,16,0"
+                      Visibility="{Binding IsAuditTab, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="Relancer le bilan" Style="{StaticResource PrimaryButton}" Command="{Binding RunAuditCommand}" />
+                            <TextBlock Text="{Binding AuditSummary}" Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                        </DockPanel>
+                        <ProgressBar IsIndeterminate="True" Margin="0,10,0,0"
+                                     Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+                    </StackPanel>
+                </Border>
+
+                <ItemsControl ItemsSource="{Binding Findings}" Margin="0,10,0,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:FindingViewModel}">
+                            <Border Style="{StaticResource Row}">
+                                <DockPanel>
+                                    <Border DockPanel.Dock="Left" Style="{StaticResource SeverityBack}" Margin="0,0,12,0" ToolTip="{Binding SeverityLabel}">
+                                        <TextBlock Style="{StaticResource SeverityGlyph}" />
+                                    </Border>
+                                    <Button DockPanel.Dock="Right" Content="{Binding FixLabel}" Style="{StaticResource SecondaryButton}" Padding="12,5"
+                                            VerticalAlignment="Top" Margin="12,0,0,0"
+                                            Visibility="{Binding HasFix, Converter={StaticResource BoolToVisibility}}"
+                                            Command="{Binding DataContext.FixCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}" />
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Title}" Style="{StaticResource ItemTitle}" />
+                                        <TextBlock Text="{Binding Detail}" Style="{StaticResource ItemDescription}" />
+                                    </StackPanel>
+                                </DockPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <StackPanel Visibility="{Binding HasExtensions, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,16">
+                    <TextBlock Text="EXTENSIONS DES NAVIGATEURS" Style="{StaticResource SectionTitle}" />
+                    <TextBlock Style="{StaticResource ItemDescription}" Margin="4,0,0,8"
+                               Text="Les extensions voient les pages que vous visitez. Retirez depuis le navigateur celles que vous ne reconnaissez pas (« Coupons », « Recherche… », « Lecteur PDF »… sont souvent des logiciels publicitaires)." />
+                    <ItemsControl ItemsSource="{Binding Extensions}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="2" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type sec:BrowserExtension}">
+                                <Border Style="{StaticResource Row}" Margin="0,0,6,6" Padding="10,8">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Style="{StaticResource ItemDescription}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0">
+                                            <Run Text="{Binding Browser, Mode=OneWay}" FontWeight="SemiBold" />
+                                            <Run Text="{Binding Id, Mode=OneWay, StringFormat=' · {0}'}" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- ============ Second avis ============ -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,0,-16,0" Padding="0,0,16,0"
+                      Visibility="{Binding IsSecondOpinionTab, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel>
+                <Border Style="{StaticResource WarningBanner}" Margin="0,0,0,10">
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource WarningBrush}"
+                               Text="Chaque scanner est téléchargé à chaque utilisation depuis le site de son éditeur, pour avoir ses signatures du jour. PureClean vérifie sa signature numérique avant de le lancer : un fichier qui ne vient pas de l'éditeur attendu est supprimé sans être exécuté." />
+                </Border>
+                <ItemsControl ItemsSource="{Binding Scanners}" Margin="0,0,0,16">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:ScannerViewModel}">
+                            <Border Style="{StaticResource Row}" Padding="16,12">
+                                <DockPanel>
+                                    <Button DockPanel.Dock="Right" Content="Télécharger et lancer" Style="{StaticResource PrimaryButton}"
+                                            VerticalAlignment="Center" Margin="16,0,0,0"
+                                            Command="{Binding DataContext.RunScannerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}" />
+                                    <StackPanel>
+                                        <TextBlock Style="{StaticResource ItemTitle}">
+                                            <Run Text="{Binding Name, Mode=OneWay}" />
+                                            <Run Text="{Binding Publisher, Mode=OneWay, StringFormat=' · {0}'}" FontWeight="Normal"
+                                                 Foreground="{DynamicResource MutedTextBrush}" FontSize="12" />
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Description}" Style="{StaticResource ItemDescription}" />
+                                        <TextBlock Text="{Binding Status}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold"
+                                                   TextWrapping="Wrap" Margin="0,4,0,0"
+                                                   Visibility="{Binding Status, Converter={StaticResource IsNotEmptyToVisibility}}" />
+                                        <ProgressBar IsIndeterminate="True" Margin="0,8,0,0"
+                                                     Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+                                    </StackPanel>
+                                </DockPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

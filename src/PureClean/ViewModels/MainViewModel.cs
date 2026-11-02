@@ -16,6 +16,7 @@ public sealed class MainViewModel : ObservableObject
         Home = new HomeViewModel(cleaner, Navigate, Startup);
         Programs = new ProgramsViewModel();
         Software = new SoftwareViewModel();
+        Security = new SecurityViewModel();
 
         NavigationItems =
         [
@@ -23,6 +24,7 @@ public sealed class MainViewModel : ObservableObject
             new("Nettoyage", "\uE74D", cleaner),
             new("Analyse disque", "\uEDA2", new DiskAnalyzerViewModel()),
             new("Doublons", "\uE8C8", new DuplicatesViewModel()),
+            new("Sécurité", "\uEA18", Security),
             new("Programmes", "\uE71D", Programs),
             new("Logiciels", "\uE7B8", Software),
             new("Démarrage", "\uE7E8", Startup),
@@ -44,6 +46,8 @@ public sealed class MainViewModel : ObservableObject
 
     public SoftwareViewModel Software { get; }
 
+    public SecurityViewModel Security { get; }
+
     public NavigationItem SelectedItem
     {
         get => _selectedItem;
@@ -62,6 +66,8 @@ public sealed class MainViewModel : ObservableObject
                 Programs.RefreshCommand.Execute(null);
             if (value.Page == Software)
                 Software.OnShown();
+            if (value.Page == Security)
+                Security.EnsureLoaded();
         }
     }
 

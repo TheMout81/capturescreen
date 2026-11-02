@@ -29,6 +29,13 @@ Arborescence à la manière de TreeSize : chaque dossier avec sa taille, sa part
 ### Doublons
 Fichiers au contenu strictement identique : comparaison par taille, puis par empreinte du début et de la fin, puis par empreinte SHA-256 complète. Sélection automatique (garder le plus ancien ou le plus récent). Il est impossible de supprimer tous les exemplaires d'un même fichier. Les dossiers de Windows, des programmes, `AppData` et `.git` sont exclus.
 
+### Sécurité
+PureClean n'est pas un antivirus et n'en imite pas un : il pilote des moteurs maintenus par leurs éditeurs.
+
+- **Protection** : état de Microsoft Defender (protection en temps réel, âge des signatures, dernières analyses, protection contre les falsifications) et du pare-feu ; mise à jour des signatures, analyse rapide, complète, d'un dossier ou hors ligne (au redémarrage) ; historique des menaces détectées.
+- **Bilan de sécurité** : contrôle des réglages que les logiciels malveillants et publicitaires détournent le plus souvent. Il vérifie la protection en temps réel, les exclusions de Defender, le pare-feu, le contrôle de compte (UAC), Windows Update (pause, stratégie, service), le fichier `hosts`, le proxy, les serveurs DNS, les programmes au démarrage (lancés depuis un dossier temporaire, non signés, scripts PowerShell masqués…), les extensions et pages d'accueil imposées aux navigateurs, et le Bureau à distance. Chaque correction est proposée et confirmée, jamais automatique. Les extensions installées dans chaque navigateur sont listées.
+- **Second avis** : AdwCleaner (Malwarebytes), Microsoft Safety Scanner et Emsisoft Emergency Kit, téléchargés à chaque utilisation chez leur éditeur pour avoir les signatures du jour, et lancés seulement si leur signature numérique est valide et au nom de l'éditeur attendu.
+
 ### Programmes
 Logiciels installés, avec recherche et tri par nom, taille ou date. La désinstallation lance le programme officiel de l'éditeur.
 
@@ -68,7 +75,7 @@ Optimisations réversibles : confidentialité (télémétrie, publicités, reche
 2. Décompressez et lancez `PureClean.exe`. Il est autonome : rien à installer.
 3. Windows demande les droits administrateur (nécessaires pour nettoyer `C:\Windows` et modifier les réglages système).
 
-L'exécutable n'est pas signé : SmartScreen peut afficher « Windows a protégé votre ordinateur ». Cliquez sur *Informations complémentaires* puis *Exécuter quand même*.
+L'exécutable n'est pas signé : SmartScreen peut afficher « Windows a protégé votre ordinateur ». Cliquez sur *Informations complémentaires* puis *Exécuter quand même*. Pour ne plus voir ce message sur un PC : clic droit sur `PureClean.exe` → Propriétés → cochez « Débloquer ».
 
 Les préférences et l'historique sont stockés dans `%LOCALAPPDATA%\PureClean`.
 
@@ -104,6 +111,7 @@ src/PureClean/
 │   ├── DiskAnalysis/           Analyse de l'espace disque
 │   ├── Duplicates/             Recherche de doublons
 │   ├── Programs/               Programmes installés
+│   ├── Security/               Defender, bilan de sécurité, scanners de second avis
 │   ├── Software/               Catalogue, profils, installation de RustDesk
 │   ├── Updates/                Client winget
 │   ├── Startup/                Programmes et tâches au démarrage
@@ -114,7 +122,7 @@ src/PureClean/
 └── Views/                      Pages WPF
 ```
 
-### Sécurité
+### Sécurité du nettoyage
 - Les liens symboliques et jonctions ne sont **jamais suivis** : impossible de sortir du dossier ciblé.
 - Les fichiers verrouillés sont ignorés sans erreur, et les fichiers temporaires récents (moins de 24 h) sont conservés.
 - Seul le contenu des dossiers ciblés est supprimé, jamais les dossiers eux-mêmes.
