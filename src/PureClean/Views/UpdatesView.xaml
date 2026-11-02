@@ -1,0 +1,66 @@
+<UserControl x:Class="PureClean.Views.UpdatesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PureClean.ViewModels">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock Text="Mises à jour des logiciels" Style="{StaticResource PageTitle}" />
+            <TextBlock Style="{StaticResource PageSubtitle}"
+                       Text="Utilise winget, le gestionnaire de paquets officiel de Microsoft. C'est la seule page de PureClean qui se connecte à Internet, et seulement quand vous cliquez sur « Rechercher »." />
+        </StackPanel>
+
+        <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,20,0,8">
+            <StackPanel>
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="Annuler" Style="{StaticResource SecondaryButton}" Command="{Binding CancelCommand}"
+                                Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+                        <Button Content="Rechercher" Style="{StaticResource SecondaryButton}" Command="{Binding CheckCommand}" />
+                        <Button Content="Tout mettre à jour" Style="{StaticResource PrimaryButton}" Command="{Binding UpdateAllCommand}" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding StatusText}" Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                </DockPanel>
+                <ProgressBar IsIndeterminate="True" Margin="0,12,0,0"
+                             Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,4,-16,0" Padding="0,0,16,0">
+            <ItemsControl ItemsSource="{Binding Updates}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:UpdateItemViewModel}">
+                        <Border Style="{StaticResource Row}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}" Style="{StaticResource ItemTitle}" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Style="{StaticResource ItemDescription}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis">
+                                        <Run Text="{Binding Versions, Mode=OneWay}" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" />
+                                        <Run Text="  ·  " />
+                                        <Run Text="{Binding Id, Mode=OneWay}" />
+                                    </TextBlock>
+                                </StackPanel>
+                                <TextBlock Grid.Column="1" Text="{Binding Status}" Style="{StaticResource ItemDescription}"
+                                           VerticalAlignment="Center" Margin="12,0" />
+                                <Button Grid.Column="2" Content="Mettre à jour" Style="{StaticResource SecondaryButton}" Padding="12,5"
+                                        Visibility="{Binding IsDone, Converter={StaticResource InverseBoolToVisibility}}"
+                                        Command="{Binding DataContext.UpdateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

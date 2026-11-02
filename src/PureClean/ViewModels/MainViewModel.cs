@@ -23,6 +23,7 @@ public sealed class MainViewModel : ObservableObject
             new("Analyse disque", "\uEDA2", new DiskAnalyzerViewModel()),
             new("Doublons", "\uE8C8", new DuplicatesViewModel()),
             new("Programmes", "\uE71D", Programs),
+            new("Mises à jour", "\uE895", new UpdatesViewModel()),
             new("Démarrage", "\uE7E8", Startup),
             new("Réglages Windows", "\uE90F", new TweaksViewModel()),
             new("Paramètres", "\uE713", new SettingsViewModel()),
