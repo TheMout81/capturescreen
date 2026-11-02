@@ -47,6 +47,11 @@ for path, text in xaml.items():
             tag, binding = match.group(1), match.group(2)
             if "Mode=OneWay" in binding or "Mode=OneTime" in binding:
                 continue
+            if tag == "<Setter":
+                # Le sens de la liaison dépend de la propriété visée par le Setter.
+                target = re.search(r'Property="([^"]+)"', match.group(0))
+                if not target or target.group(1) not in TWO_WAY or target.group(1) == "Text":
+                    continue
             if attr == "Text" and tag not in TWO_WAY_TEXT_TAGS:
                 continue
             prop = binding.split(",")[0].strip().removeprefix("Path=").split(".")[-1]

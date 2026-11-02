@@ -43,3 +43,13 @@ public sealed class EqualsConverter : IValueConverter
             : System.Convert.ChangeType(text, target, CultureInfo.InvariantCulture);
     }
 }
+
+/// <summary>Vrai si la valeur est une chaîne non vide.</summary>
+public sealed class IsNotEmptyConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        => value is string { Length: > 0 };
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}

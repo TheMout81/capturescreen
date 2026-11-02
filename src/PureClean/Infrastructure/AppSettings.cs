@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureClean.Core.Software;
 
 namespace PureClean.Infrastructure;
 
@@ -49,6 +50,11 @@ public sealed class AppSettings
     public List<string> CustomFolders { get; set; } = [];
 
     public ScheduleSettings Schedule { get; set; } = new();
+
+    /// <summary>Liste de la page Logiciels (avec les cases cochées) ; null = liste par défaut.</summary>
+    public List<SoftwareEntry>? SoftwareList { get; set; }
+
+    public RustDeskSettings RustDesk { get; set; } = new();
 
     public void Save()
     {

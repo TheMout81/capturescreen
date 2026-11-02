@@ -1,0 +1,36 @@
+<UserControl x:Class="PureClean.Views.SoftwareView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock Text="Logiciels" Style="{StaticResource PageTitle}" />
+            <TextBlock Style="{StaticResource PageSubtitle}"
+                       Text="Installez et mettez à jour vos logiciels en un clic, sans publicité ni logiciel ajouté. Cette page utilise Internet via winget, l'outil officiel de Microsoft (et GitHub pour RustDesk)." />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,16,0,12">
+            <RadioButton Style="{StaticResource PillRadio}" GroupName="SoftwareTab"
+                         IsChecked="{Binding Tab, Converter={StaticResource Equals}, ConverterParameter=Install}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE896;" Style="{StaticResource Glyph}" FontSize="13" Margin="0,0,8,0" />
+                    <TextBlock Text="Installer" />
+                </StackPanel>
+            </RadioButton>
+            <RadioButton Style="{StaticResource PillRadio}" GroupName="SoftwareTab"
+                         IsChecked="{Binding Tab, Converter={StaticResource Equals}, ConverterParameter=Updates}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE895;" Style="{StaticResource Glyph}" FontSize="13" Margin="0,0,8,0" />
+                    <TextBlock Text="Mises à jour" />
+                </StackPanel>
+            </RadioButton>
+        </StackPanel>
+
+        <ContentControl Grid.Row="2" Content="{Binding CurrentTab}" Focusable="False" />
+    </Grid>
+</UserControl>

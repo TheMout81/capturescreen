@@ -96,7 +96,7 @@
                                 <Run Text="{Binding Version, Mode=OneWay}" />
                             </TextBlock>
                             <TextBlock Style="{StaticResource ItemDescription}" MaxWidth="560"
-                                       Text="Logiciel libre (licence MIT). Aucune publicité, aucun abonnement, aucune télémétrie. PureClean n'envoie aucune donnée : seule la page « Mises à jour » utilise Internet, via l'outil winget de Microsoft." />
+                                       Text="Logiciel libre (licence MIT). Aucune publicité, aucun abonnement, aucune télémétrie. PureClean n'envoie aucune donnée : seule la page « Logiciels » utilise Internet, via l'outil winget de Microsoft (et GitHub pour RustDesk), et uniquement quand vous le demandez." />
                         </StackPanel>
                     </StackPanel>
                 </Border>

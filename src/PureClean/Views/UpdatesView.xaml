@@ -9,13 +9,8 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <StackPanel>
-            <TextBlock Text="Mises à jour des logiciels" Style="{StaticResource PageTitle}" />
-            <TextBlock Style="{StaticResource PageSubtitle}"
-                       Text="Utilise winget, le gestionnaire de paquets officiel de Microsoft. C'est la seule page de PureClean qui se connecte à Internet, et seulement quand vous cliquez sur « Rechercher »." />
-        </StackPanel>
 
-        <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,20,0,8">
+        <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,8">
             <StackPanel>
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">

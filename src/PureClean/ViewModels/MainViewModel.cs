@@ -15,6 +15,7 @@ public sealed class MainViewModel : ObservableObject
         Startup = new StartupViewModel();
         Home = new HomeViewModel(cleaner, Navigate, Startup);
         Programs = new ProgramsViewModel();
+        Software = new SoftwareViewModel();
 
         NavigationItems =
         [
@@ -23,7 +24,7 @@ public sealed class MainViewModel : ObservableObject
             new("Analyse disque", "\uEDA2", new DiskAnalyzerViewModel()),
             new("Doublons", "\uE8C8", new DuplicatesViewModel()),
             new("Programmes", "\uE71D", Programs),
-            new("Mises à jour", "\uE895", new UpdatesViewModel()),
+            new("Logiciels", "\uE7B8", Software),
             new("Démarrage", "\uE7E8", Startup),
             new("Réglages Windows", "\uE90F", new TweaksViewModel()),
             new("Paramètres", "\uE713", new SettingsViewModel()),
@@ -41,6 +42,8 @@ public sealed class MainViewModel : ObservableObject
 
     public ProgramsViewModel Programs { get; }
 
+    public SoftwareViewModel Software { get; }
+
     public NavigationItem SelectedItem
     {
         get => _selectedItem;
@@ -57,6 +60,8 @@ public sealed class MainViewModel : ObservableObject
                 Startup.RefreshCommand.Execute(null);
             if (value.Page == Programs && !Programs.IsLoaded && Programs.RefreshCommand.CanExecute(null))
                 Programs.RefreshCommand.Execute(null);
+            if (value.Page == Software)
+                Software.OnShown();
         }
     }
 

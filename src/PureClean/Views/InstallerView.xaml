@@ -1,0 +1,208 @@
+<UserControl x:Class="PureClean.Views.InstallerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PureClean.ViewModels"
+             xmlns:upd="clr-namespace:PureClean.Core.Updates">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- winget absent (Windows tout neuf) -->
+        <Border Style="{StaticResource WarningBanner}" Margin="0,0,0,8"
+                Visibility="{Binding WingetMissing, Converter={StaticResource BoolToVisibility}}">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Content="Ouvrir le Microsoft Store" Style="{StaticResource SecondaryButton}"
+                        Command="{Binding OpenStoreCommand}" />
+                <TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Foreground="{DynamicResource WarningBrush}"
+                           Text="winget n'est pas encore actif sur ce PC. Mettez à jour « Programme d'installation d'application » dans le Microsoft Store, puis cliquez sur « Actualiser »." />
+            </DockPanel>
+        </Border>
+
+        <!-- Actions -->
+        <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,8">
+            <StackPanel>
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="Actualiser" Style="{StaticResource SecondaryButton}" Command="{Binding RefreshCommand}" />
+                        <Button Content="Installer la sélection" Style="{StaticResource PrimaryButton}" Command="{Binding InstallCommand}" />
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="{Binding SelectionText}" Style="{StaticResource ItemTitle}" />
+                        <TextBlock Text="{Binding StatusText}" Style="{StaticResource ItemDescription}" />
+                    </StackPanel>
+                </DockPanel>
+                <WrapPanel Margin="0,10,0,0">
+                    <Button Content="Cocher les non installés" Style="{StaticResource LinkButton}" Command="{Binding SelectMissingCommand}" />
+                    <Button Content="Tout décocher" Style="{StaticResource LinkButton}" Command="{Binding SelectNoneCommand}" />
+                    <TextBlock Text="|" Foreground="{DynamicResource BorderBrush}" Margin="0,0,16,0" />
+                    <Button Content="Importer un profil…" Style="{StaticResource LinkButton}" Command="{Binding ImportCommand}" />
+                    <Button Content="Exporter la sélection…" Style="{StaticResource LinkButton}" Command="{Binding ExportCommand}" />
+                    <Button Content="Créer un profil depuis ce PC" Style="{StaticResource LinkButton}" Command="{Binding FromPcCommand}" />
+                    <Button Content="Liste par défaut" Style="{StaticResource LinkButton}" Command="{Binding ResetCommand}" />
+                </WrapPanel>
+                <ProgressBar IsIndeterminate="True" Margin="0,10,0,0"
+                             Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,0,-16,0" Padding="0,0,16,0">
+            <StackPanel>
+                <!-- Recherche dans le catalogue winget -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,8">
+                    <StackPanel>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="Rechercher" Style="{StaticResource SecondaryButton}" Command="{Binding SearchCommand}" />
+                            <Grid>
+                                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Padding="32,6,8,6">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Return" Command="{Binding SearchCommand}" />
+                                    </TextBox.InputBindings>
+                                </TextBox>
+                                <TextBlock Text="&#xE721;" Style="{StaticResource Glyph}" FontSize="13" Margin="11,0,0,0"
+                                           Foreground="{DynamicResource MutedTextBrush}" IsHitTestVisible="False" />
+                            </Grid>
+                        </DockPanel>
+                        <DockPanel Margin="0,6,0,0">
+                            <Button DockPanel.Dock="Right" Content="Effacer" Style="{StaticResource LinkButton}" Margin="0"
+                                    Command="{Binding ClearSearchCommand}"
+                                    Visibility="{Binding HasSearchResults, Converter={StaticResource BoolToVisibility}}" />
+                            <TextBlock Margin="0">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource ItemDescription}">
+                                        <Setter Property="Text" Value="{Binding SearchStatus}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SearchStatus}" Value="">
+                                                <Setter Property="Text" Value="Ajoutez n'importe quel logiciel du catalogue winget ou du Microsoft Store à votre liste." />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DockPanel>
+                        <ItemsControl ItemsSource="{Binding SearchResults}" Margin="0,8,0,0"
+                                      Visibility="{Binding HasSearchResults, Converter={StaticResource BoolToVisibility}}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type upd:SearchResult}">
+                                    <DockPanel Margin="0,3">
+                                        <Button DockPanel.Dock="Right" Content="Ajouter" Style="{StaticResource SecondaryButton}" Padding="12,4"
+                                                Command="{Binding DataContext.AddResultCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}" />
+                                        <TextBlock VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
+                                            <Run Text="{Binding Name, Mode=OneWay}" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" />
+                                            <Run Text="{Binding Id, Mode=OneWay, StringFormat='  {0}'}" Foreground="{DynamicResource MutedTextBrush}" />
+                                            <Run Text="{Binding Version, Mode=OneWay, StringFormat='  · {0}'}" Foreground="{DynamicResource MutedTextBrush}" />
+                                            <Run Text="{Binding Source, Mode=OneWay, StringFormat='  · {0}'}" Foreground="{DynamicResource MutedTextBrush}" />
+                                        </TextBlock>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Configuration RustDesk (serveur auto-hébergé) -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,8"
+                        Visibility="{Binding HasRustDesk, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="Appliquer à RustDesk installé" Style="{StaticResource SecondaryButton}"
+                                    Command="{Binding ApplyRustDeskCommand}" />
+                            <StackPanel>
+                                <TextBlock Text="Serveur RustDesk" Style="{StaticResource ItemTitle}" />
+                                <TextBlock Style="{StaticResource ItemDescription}"
+                                           Text="Appliqué automatiquement après l'installation de RustDesk, et enregistré dans vos profils exportés." />
+                            </StackPanel>
+                        </DockPanel>
+                        <TextBlock Text="Chaîne de configuration (RustDesk → Paramètres → Réseau → Exporter la configuration du serveur)"
+                                   Style="{StaticResource ItemDescription}" Margin="0,12,0,4" />
+                        <TextBox Text="{Binding RustDeskConfigString}" />
+                        <TextBlock Text="… ou, à défaut, les adresses du serveur :" Style="{StaticResource ItemDescription}" Margin="0,10,0,4" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="2*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Serveur ID" Style="{StaticResource ItemDescription}" Margin="0,0,0,2" />
+                                <TextBox Text="{Binding RustDeskIdServer}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Serveur relais (facultatif)" Style="{StaticResource ItemDescription}" Margin="0,0,0,2" />
+                                <TextBox Text="{Binding RustDeskRelayServer}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Text="Clé publique" Style="{StaticResource ItemDescription}" Margin="0,0,0,2" />
+                                <TextBox Text="{Binding RustDeskKey}" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Catalogue -->
+                <ItemsControl ItemsSource="{Binding Categories}" Margin="0,0,0,16">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:SoftwareCategoryViewModel}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Name}" Style="{StaticResource SectionTitle}" />
+                                <ItemsControl ItemsSource="{Binding Items}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <UniformGrid Columns="3" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vm:SoftwareItemViewModel}">
+                                            <Border Style="{StaticResource Row}" Margin="0,0,6,6" Padding="10,8">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <CheckBox Style="{StaticResource CheckBoxModern}" IsChecked="{Binding IsSelected}"
+                                                              IsEnabled="{Binding DataContext.IsBusy, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBool}}">
+                                                        <StackPanel>
+                                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}"
+                                                                       TextTrimming="CharacterEllipsis" />
+                                                            <TextBlock TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                                                                       Margin="0" ToolTip="{Binding Details}">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock" BasedOn="{StaticResource ItemDescription}">
+                                                                        <Setter Property="Text" Value="{Binding Details}" />
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsInstalled}" Value="True">
+                                                                                <Setter Property="Text" Value="Installé" />
+                                                                                <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+                                                                            </DataTrigger>
+                                                                            <DataTrigger Binding="{Binding Status, Converter={StaticResource IsNotEmpty}}" Value="True">
+                                                                                <Setter Property="Text" Value="{Binding Status}" />
+                                                                                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                        </StackPanel>
+                                                    </CheckBox>
+                                                    <Button Grid.Column="1" Style="{StaticResource IconButton}" Content="&#xE711;" Width="24" Height="24" FontSize="10"
+                                                            ToolTip="Retirer de la liste" VerticalAlignment="Top"
+                                                            Command="{Binding DataContext.RemoveCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            CommandParameter="{Binding}" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

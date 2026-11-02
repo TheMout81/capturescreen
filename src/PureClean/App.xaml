@@ -27,6 +27,12 @@
             <DataTemplate DataType="{x:Type vm:ProgramsViewModel}">
                 <views:ProgramsView />
             </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:SoftwareViewModel}">
+                <views:SoftwareView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:InstallerViewModel}">
+                <views:InstallerView />
+            </DataTemplate>
             <DataTemplate DataType="{x:Type vm:UpdatesViewModel}">
                 <views:UpdatesView />
             </DataTemplate>
