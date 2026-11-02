@@ -1,0 +1,135 @@
+<UserControl x:Class="PureClean.Views.DuplicatesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PureClean.ViewModels">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock Text="Fichiers en double" Style="{StaticResource PageTitle}" />
+            <TextBlock Style="{StaticResource PageSubtitle}"
+                       Text="Trouve les fichiers au contenu strictement identique (photos, vidéos, documents…). Les dossiers de Windows, des programmes et des applications (AppData) sont exclus." />
+        </StackPanel>
+
+        <!-- Paramètres de recherche -->
+        <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,20,0,8">
+            <StackPanel>
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Top">
+                        <Button Content="Annuler" Style="{StaticResource SecondaryButton}" Command="{Binding CancelCommand}"
+                                Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibility}}" />
+                        <Button Content="Rechercher" Style="{StaticResource PrimaryButton}" Command="{Binding ScanCommand}" />
+                    </StackPanel>
+                    <ItemsControl ItemsSource="{Binding Folders}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="14" Padding="12,2,4,2" Margin="0,0,6,6" Background="{DynamicResource BackgroundBrush}"
+                                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" ToolTip="{Binding}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE8B7;" Style="{StaticResource Glyph}" FontSize="12"
+                                                   Foreground="{DynamicResource AccentBrush}" Margin="0,0,6,0" />
+                                        <TextBlock Text="{Binding}" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center"
+                                                   MaxWidth="260" TextTrimming="CharacterEllipsis" />
+                                        <Button Style="{StaticResource IconButton}" Content="&#xE711;" Width="24" Height="24" FontSize="10"
+                                                ToolTip="Retirer" Margin="4,0,0,0"
+                                                Command="{Binding DataContext.RemoveFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}" />
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </DockPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                    <Button Content="+ Ajouter un dossier" Style="{StaticResource LinkButton}" Command="{Binding AddFolderCommand}"
+                            VerticalAlignment="Center" Margin="0,0,24,0" />
+                    <TextBlock Text="Taille minimale :" Style="{StaticResource ItemDescription}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <RadioButton Style="{StaticResource PillRadio}" Content="100 Ko" GroupName="MinSize"
+                                 IsChecked="{Binding MinimumSize, Converter={StaticResource Equals}, ConverterParameter=102400}" />
+                    <RadioButton Style="{StaticResource PillRadio}" Content="1 Mo" GroupName="MinSize"
+                                 IsChecked="{Binding MinimumSize, Converter={StaticResource Equals}, ConverterParameter=1048576}" />
+                    <RadioButton Style="{StaticResource PillRadio}" Content="10 Mo" GroupName="MinSize"
+                                 IsChecked="{Binding MinimumSize, Converter={StaticResource Equals}, ConverterParameter=10485760}" />
+                </StackPanel>
+                <TextBlock Text="{Binding StatusText}" Style="{StaticResource ItemDescription}" Margin="0,10,0,0" />
+                <ProgressBar IsIndeterminate="True" Margin="0,10,0,0"
+                             Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibility}}" />
+            </StackPanel>
+        </Border>
+
+        <!-- Sélection -->
+        <DockPanel Grid.Row="2" Margin="4,8,0,8" Visibility="{Binding HasResults, Converter={StaticResource BoolToVisibility}}">
+            <Button DockPanel.Dock="Right" Content="Envoyer à la corbeille" Style="{StaticResource DangerButton}" Command="{Binding DeleteCommand}" />
+            <TextBlock DockPanel.Dock="Right" Text="{Binding SelectionText}" Foreground="{DynamicResource TextBrush}"
+                       FontWeight="SemiBold" VerticalAlignment="Center" Margin="16,0,8,0" />
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Sélection automatique :" Style="{StaticResource ItemDescription}" Margin="0,0,12,0" VerticalAlignment="Center" />
+                <Button Content="garder le plus ancien" Style="{StaticResource LinkButton}" Command="{Binding KeepOldestCommand}" />
+                <Button Content="garder le plus récent" Style="{StaticResource LinkButton}" Command="{Binding KeepNewestCommand}" />
+                <Button Content="tout décocher" Style="{StaticResource LinkButton}" Command="{Binding ClearSelectionCommand}" />
+            </StackPanel>
+        </DockPanel>
+
+        <!-- Résultats -->
+        <ListBox Grid.Row="3" ItemsSource="{Binding Groups}" Background="Transparent" BorderThickness="0"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                 VirtualizingPanel.ScrollUnit="Pixel">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type vm:DuplicateGroupViewModel}">
+                    <Border Style="{StaticResource Row}" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Header}" Style="{StaticResource ItemTitle}" Margin="0,0,0,6" />
+                            <ItemsControl ItemsSource="{Binding Files}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:DuplicateFileViewModel}">
+                                        <Grid Margin="0,3">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <CheckBox Style="{StaticResource CheckBoxModern}" IsChecked="{Binding IsChecked}" ToolTip="Cocher pour supprimer cette copie">
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Name}" Foreground="{DynamicResource TextBrush}" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Text="{Binding Folder}" Style="{StaticResource ItemDescription}" TextWrapping="NoWrap"
+                                                               TextTrimming="CharacterEllipsis" Margin="0" />
+                                                </StackPanel>
+                                            </CheckBox>
+                                            <TextBlock Grid.Column="1" Text="{Binding DateText}" Style="{StaticResource ItemDescription}"
+                                                       VerticalAlignment="Center" Margin="12,0" />
+                                            <Button Grid.Column="2" Style="{StaticResource IconButton}" Content="&#xE838;" ToolTip="Afficher dans l'Explorateur"
+                                                    Command="{Binding DataContext.OpenFileCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>
