@@ -23,8 +23,11 @@ public class PathCleaner : ICleaner
         bool enabledByDefault = true,
         TimeSpan? minimumAge = null,
         IReadOnlyList<string>? blockingProcesses = null,
-        Func<bool>? isAvailable = null)
+        Func<bool>? isAvailable = null,
+        bool requireClosedProcesses = false,
+        string? id = null)
     {
+        Id = id ?? name;
         Name = name;
         Description = description;
         Category = category;
@@ -33,8 +36,10 @@ public class PathCleaner : ICleaner
         BlockingProcesses = blockingProcesses ?? [];
         _targets = targets;
         _isAvailable = isAvailable;
+        RequireClosedProcesses = requireClosedProcesses;
     }
 
+    public string Id { get; }
     public string Name { get; }
     public string Description { get; }
     public CleanerCategory Category { get; }
@@ -43,6 +48,12 @@ public class PathCleaner : ICleaner
 
     /// <summary>Les fichiers plus récents que cet âge sont conservés (ex. installations en cours).</summary>
     public TimeSpan MinimumAge { get; }
+
+    /// <summary>
+    /// Refuse de nettoyer tant qu'un des <see cref="BlockingProcesses"/> tourne
+    /// (bases de données de navigateur : une suppression partielle les corromprait).
+    /// </summary>
+    public bool RequireClosedProcesses { get; }
 
     public bool IsAvailable => _isAvailable?.Invoke() ?? Targets().Any(t => Directory.Exists(t.Path));
 
@@ -60,6 +71,9 @@ public class PathCleaner : ICleaner
 
     public CleanResult Clean(CancellationToken cancellationToken)
     {
+        if (RequireClosedProcesses && BlockingProcesses.Any(ProcessHelper.IsRunning))
+            throw new InvalidOperationException("programme ouvert, fermez-le puis relancez le nettoyage");
+
         long freed = 0;
         int deleted = 0, skipped = 0;
 

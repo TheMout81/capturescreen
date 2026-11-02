@@ -23,6 +23,30 @@
                 </Grid>
             </Border>
         </DataTemplate>
+
+        <DataTemplate x:Key="CustomItemTemplate" DataType="{x:Type vm:CleanerItemViewModel}">
+            <Border Style="{StaticResource Row}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <CheckBox Style="{StaticResource CheckBoxModern}" IsChecked="{Binding IsSelected}"
+                              IsEnabled="{Binding DataContext.IsBusy, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBool}}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Name}" Style="{StaticResource ItemTitle}" />
+                            <TextBlock Text="{Binding Description}" Style="{StaticResource ItemDescription}" />
+                        </StackPanel>
+                    </CheckBox>
+                    <TextBlock Grid.Column="1" Text="{Binding ResultText}" Foreground="{DynamicResource AccentBrush}"
+                               FontWeight="SemiBold" VerticalAlignment="Center" Margin="16,0,8,0" />
+                    <Button Grid.Column="2" Style="{StaticResource IconButton}" Content="&#xE711;" ToolTip="Retirer ce dossier de la liste"
+                            Command="{Binding DataContext.RemoveCustomFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}" />
+                </Grid>
+            </Border>
+        </DataTemplate>
     </UserControl.Resources>
 
     <Grid>
@@ -35,7 +59,7 @@
         <StackPanel>
             <TextBlock Text="Nettoyage" Style="{StaticResource PageTitle}" />
             <TextBlock Style="{StaticResource PageSubtitle}"
-                       Text="Supprime les fichiers temporaires et les caches de Windows et de vos applications. Vos documents, mots de passe, cookies et historiques ne sont jamais touchés." />
+                       Text="Supprime les fichiers temporaires et les caches de Windows et de vos applications. Vos choix sont mémorisés. Documents, mots de passe et favoris ne sont jamais touchés." />
         </StackPanel>
 
         <!-- Résumé et actions -->
@@ -81,8 +105,33 @@
 
                 <TextBlock Text="APPLICATIONS ET NAVIGATEURS" Style="{StaticResource SectionTitle}" />
                 <ItemsControl ItemsSource="{Binding ApplicationItems}" ItemTemplate="{StaticResource CleanerItemTemplate}" />
-                <TextBlock Style="{StaticResource ItemDescription}" Margin="4,4,0,16"
+                <TextBlock Style="{StaticResource ItemDescription}" Margin="4,4,0,0"
                            Text="Seules les applications installées sur ce PC sont affichées. Fermez-les avant le nettoyage pour un résultat complet." />
+
+                <StackPanel Visibility="{Binding HasPrivacyItems, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Text="CONFIDENTIALITÉ DES NAVIGATEURS" Style="{StaticResource SectionTitle}" />
+                    <Border Style="{StaticResource WarningBanner}" Margin="0,0,0,8">
+                        <TextBlock TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource WarningBrush}"
+                                   Text="Supprimer les cookies vous déconnecte de tous les sites. Ces éléments ne sont jamais cochés par défaut, et ne sont nettoyés que si le navigateur est fermé." />
+                    </Border>
+                    <ItemsControl ItemsSource="{Binding PrivacyItems}" ItemTemplate="{StaticResource CleanerItemTemplate}" />
+                </StackPanel>
+
+                <TextBlock Text="NETTOYAGE AVANCÉ DE WINDOWS" Style="{StaticResource SectionTitle}" />
+                <Border Style="{StaticResource WarningBanner}" Margin="0,0,0,8">
+                    <TextBlock TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource WarningBrush}"
+                               Text="Opérations longues utilisant les outils officiels de Windows. Elles libèrent souvent plusieurs Go, mais empêchent de revenir en arrière (ancienne version de Windows, désinstallation de mises à jour)." />
+                </Border>
+                <ItemsControl ItemsSource="{Binding AdvancedItems}" ItemTemplate="{StaticResource CleanerItemTemplate}" />
+
+                <DockPanel Margin="0,0,0,0">
+                    <Button DockPanel.Dock="Right" Content="Ajouter un dossier…" Style="{StaticResource LinkButton}"
+                            Command="{Binding AddCustomFolderCommand}" Margin="0" VerticalAlignment="Bottom" />
+                    <TextBlock Text="MES DOSSIERS" Style="{StaticResource SectionTitle}" Margin="4,18,0,0" />
+                </DockPanel>
+                <TextBlock Style="{StaticResource ItemDescription}" Margin="4,2,0,8"
+                           Text="Dossiers dont tout le contenu est supprimé à chaque nettoyage (par exemple le cache d'un logiciel). Les dossiers de Windows et vos documents sont protégés." />
+                <ItemsControl ItemsSource="{Binding CustomItems}" ItemTemplate="{StaticResource CustomItemTemplate}" Margin="0,0,0,16" />
             </StackPanel>
         </ScrollViewer>
     </Grid>

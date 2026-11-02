@@ -25,6 +25,33 @@ public sealed class RelayCommand : ICommand
     public void Execute(object? parameter) => _execute();
 }
 
+/// <summary>Commande recevant l'élément concerné (ex. la ligne d'une liste).</summary>
+public sealed class RelayCommand<T> : ICommand
+{
+    private readonly Action<T> _execute;
+    private readonly Func<T, bool>? _canExecute;
+
+    public RelayCommand(Action<T> execute, Func<T, bool>? canExecute = null)
+    {
+        _execute = execute;
+        _canExecute = canExecute;
+    }
+
+    public event EventHandler? CanExecuteChanged
+    {
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
+
+    public bool CanExecute(object? parameter) => parameter is T item && (_canExecute?.Invoke(item) ?? true);
+
+    public void Execute(object? parameter)
+    {
+        if (parameter is T item)
+            _execute(item);
+    }
+}
+
 /// <summary>Commande asynchrone qui se désactive pendant son exécution.</summary>
 public sealed class AsyncRelayCommand : ICommand
 {

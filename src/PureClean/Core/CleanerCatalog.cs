@@ -5,8 +5,9 @@ namespace PureClean.Core;
 
 /// <summary>
 /// Liste de tout ce que PureClean sait nettoyer.
-/// Règle : on ne touche qu'aux caches et fichiers temporaires régénérables.
-/// Mots de passe, cookies, historique et sessions des navigateurs ne sont jamais supprimés.
+/// Règle : par défaut, on ne touche qu'aux caches et fichiers temporaires régénérables.
+/// Historique et cookies ne sont supprimés que si l'utilisateur coche la section Confidentialité ;
+/// mots de passe, favoris et sessions ne sont jamais supprimés.
 /// </summary>
 public static class CleanerCatalog
 {
@@ -18,7 +19,23 @@ public static class CleanerCatalog
     private static string RoamingAppData => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
     private static string ProgramData => Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 
-    public static IReadOnlyList<ICleaner> CreateAll() => [.. WindowsCleaners(), .. ApplicationCleaners()];
+    public static IReadOnlyList<ICleaner> CreateAll(IEnumerable<string> customFolders) =>
+    [
+        .. WindowsCleaners(),
+        .. ApplicationCleaners(),
+        .. PrivacyCleaners(),
+        .. AdvancedCleaners(),
+        .. customFolders.Select(CustomFolder),
+    ];
+
+    /// <summary>Un dossier choisi par l'utilisateur : tout son contenu est supprimé.</summary>
+    public static ICleaner CustomFolder(string path) => new PathCleaner(
+        Path.GetFileName(path.TrimEnd('\\')) is { Length: > 0 } name ? name : path,
+        path,
+        CleanerCategory.Custom,
+        () => [new CleanTarget(path)],
+        isAvailable: () => true,
+        id: "custom:" + path);
 
     private static IEnumerable<ICleaner> WindowsCleaners()
     {
@@ -157,6 +174,79 @@ public static class CleanerCatalog
             blockingProcesses: ["steam", "steamwebhelper"],
             isAvailable: () => Directory.Exists(steam));
     }
+
+    private static IEnumerable<ICleaner> AdvancedCleaners()
+    {
+        yield return new PreviousWindowsCleaner();
+        yield return new ComponentStoreCleaner();
+        yield return new RestorePointsCleaner();
+    }
+
+    private static IEnumerable<ICleaner> PrivacyCleaners()
+    {
+        (string Name, string UserData, string Process)[] chromium =
+        [
+            ("Google Chrome", Path.Combine(LocalAppData, "Google", "Chrome", "User Data"), "chrome"),
+            ("Microsoft Edge", Path.Combine(LocalAppData, "Microsoft", "Edge", "User Data"), "msedge"),
+            ("Brave", Path.Combine(LocalAppData, "BraveSoftware", "Brave-Browser", "User Data"), "brave"),
+            ("Vivaldi", Path.Combine(LocalAppData, "Vivaldi", "User Data"), "vivaldi"),
+        ];
+
+        foreach (var (name, userData, process) in chromium)
+        {
+            yield return ChromiumHistory(name, () => ChromiumProfiles(userData), process, () => Directory.Exists(userData));
+            yield return ChromiumCookies(name, () => ChromiumProfiles(userData), process, () => Directory.Exists(userData));
+        }
+
+        var opera = Path.Combine(RoamingAppData, "Opera Software", "Opera Stable");
+        yield return ChromiumHistory("Opera", () => [opera], "opera", () => Directory.Exists(opera));
+        yield return ChromiumCookies("Opera", () => [opera], "opera", () => Directory.Exists(opera));
+
+        // Firefox range historique et favoris dans le même fichier : seuls les cookies sont proposés.
+        var firefoxProfiles = Path.Combine(RoamingAppData, "Mozilla", "Firefox", "Profiles");
+        yield return new PathCleaner(
+            "Mozilla Firefox — cookies",
+            "Vous serez déconnecté de tous les sites. Firefox doit être fermé. " +
+            "(L'historique de Firefox n'est pas proposé : il est stocké avec vos favoris.)",
+            CleanerCategory.Privacy,
+            () => SubDirectories(firefoxProfiles).Select(profile => new CleanTarget(profile, "cookies.sqlite*", Recursive: false)),
+            enabledByDefault: false,
+            blockingProcesses: ["firefox"],
+            isAvailable: () => Directory.Exists(firefoxProfiles),
+            requireClosedProcesses: true);
+    }
+
+    private static ICleaner ChromiumHistory(string name, Func<IEnumerable<string>> profiles, string process, Func<bool> isAvailable)
+        => new PathCleaner(
+            $"{name} — historique",
+            "Pages visitées, sites les plus consultés et suggestions de la barre d'adresse. Favoris conservés. Le navigateur doit être fermé.",
+            CleanerCategory.Privacy,
+            () => profiles().SelectMany(profile => new[]
+            {
+                new CleanTarget(profile, "History*", Recursive: false),
+                new CleanTarget(profile, "Visited Links", Recursive: false),
+                new CleanTarget(profile, "Top Sites*", Recursive: false),
+                new CleanTarget(profile, "Shortcuts*", Recursive: false),
+            }),
+            enabledByDefault: false,
+            blockingProcesses: [process],
+            isAvailable: isAvailable,
+            requireClosedProcesses: true);
+
+    private static ICleaner ChromiumCookies(string name, Func<IEnumerable<string>> profiles, string process, Func<bool> isAvailable)
+        => new PathCleaner(
+            $"{name} — cookies",
+            "Vous serez déconnecté de tous les sites. Mots de passe enregistrés conservés. Le navigateur doit être fermé.",
+            CleanerCategory.Privacy,
+            () => profiles().SelectMany(profile => new[]
+            {
+                new CleanTarget(Path.Combine(profile, "Network"), "Cookies*", Recursive: false),
+                new CleanTarget(profile, "Cookies*", Recursive: false),
+            }),
+            enabledByDefault: false,
+            blockingProcesses: [process],
+            isAvailable: isAvailable,
+            requireClosedProcesses: true);
 
     /// <summary>Navigateurs basés sur Chromium : même structure de dossiers pour tous.</summary>
     private static ICleaner ChromiumBrowser(string name, string userDataRoot, string process)

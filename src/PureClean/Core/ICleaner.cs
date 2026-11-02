@@ -4,6 +4,9 @@ namespace PureClean.Core;
 
 public interface ICleaner
 {
+    /// <summary>Identifiant stable, utilisé pour mémoriser la sélection.</summary>
+    string Id => Name;
+
     string Name { get; }
     string Description { get; }
     CleanerCategory Category { get; }
