@@ -11,11 +11,15 @@ import glob
 import re
 import sys
 
+# Sous Windows (CI GitHub), la sortie peut ne pas être en UTF-8.
+sys.stdout.reconfigure(encoding="utf-8")
+
 ROOT = "src/PureClean"
 TWO_WAY = ["Text", "IsChecked", "SelectedItem", "SelectedValue", "SelectedIndex", "Value", "IsExpanded", "IsSelected", "IsOpen"]
 TWO_WAY_TEXT_TAGS = ("<TextBox", "<Run", "<ComboBox")
 
-xaml = {p: open(p, encoding="utf-8").read() for p in glob.glob(f"{ROOT}/**/*.xaml", recursive=True)}
+# Chemins normalisés avec « / » : glob renvoie des « \\ » sous Windows.
+xaml = {p.replace("\\", "/"): open(p, encoding="utf-8").read() for p in glob.glob(f"{ROOT}/**/*.xaml", recursive=True)}
 code = "\n".join(open(p, encoding="utf-8").read() for p in glob.glob(f"{ROOT}/**/*.cs", recursive=True))
 errors = []
 
