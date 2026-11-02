@@ -59,7 +59,7 @@ public sealed class AsyncRelayCommand : ICommand
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "PureClean", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(ex.Message, AppInfo.Title, MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally
         {

@@ -40,7 +40,7 @@ Chaque réglage mémorise la valeur Windows d'origine et peut être annulé. Un 
 
 ## Installation
 
-1. Ouvrez l'onglet **Actions** du dépôt GitHub, choisissez la dernière exécution réussie de **Build** et téléchargez l'artefact **PureClean-win-x64** (ou la page **Releases** si une version a été publiée).
+1. Ouvrez l'onglet **Actions** du dépôt GitHub, choisissez la dernière exécution réussie de **Build** et téléchargez l'artefact **PureClean-win-x64-buildN** (N = numéro de la compilation) (ou la page **Releases** si une version a été publiée).
 2. Décompressez et lancez `PureClean.exe`. Il est autonome : rien à installer.
 3. Windows demande les droits administrateur (nécessaires pour nettoyer `C:\Windows` et modifier les réglages système).
 

@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Threading;
+using PureClean.Infrastructure;
 
 namespace PureClean;
 
@@ -14,7 +15,7 @@ public partial class App : Application
     private static void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         MessageBox.Show("Une erreur inattendue s'est produite :\n\n" + e.Exception.Message,
-            "PureClean", MessageBoxButton.OK, MessageBoxImage.Error);
+            AppInfo.Title, MessageBoxButton.OK, MessageBoxImage.Error);
         e.Handled = true;
     }
 }

@@ -10,7 +10,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <RootNamespace>PureClean</RootNamespace>
     <AssemblyName>PureClean</AssemblyName>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Product>PureClean</Product>
     <Description>Nettoyeur Windows libre, sans publicité, sans abonnement, sans télémétrie.</Description>
     <!-- Permet de compiler (pas d'exécuter) depuis Linux/macOS. -->

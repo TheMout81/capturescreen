@@ -44,7 +44,9 @@ public sealed class MainViewModel : ObservableObject
 
     public bool ShowAdminWarning => !IsAdministrator;
 
-    public string Version => "v" + (typeof(MainViewModel).Assembly.GetName().Version?.ToString(3) ?? "1.0.0");
+    public string Version => AppInfo.Version;
+
+    public string WindowTitle => AppInfo.Title;
 
     private static bool CheckAdministrator()
     {
