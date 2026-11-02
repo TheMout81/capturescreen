@@ -57,7 +57,7 @@
                                Foreground="#F8C77A" FontSize="11" TextWrapping="Wrap" />
                 </Border>
                 <TextBlock Foreground="{DynamicResource SidebarTextBrush}" FontSize="11" TextWrapping="Wrap">
-                    <Run Text="100 % hors ligne — aucune donnée envoyée." />
+                    <Run Text="Aucune donnée envoyée." />
                     <LineBreak />
                     <Run Text="{Binding Version, Mode=OneWay}" />
                 </TextBlock>

@@ -11,19 +11,26 @@ public sealed class MainViewModel : ObservableObject
 
     public MainViewModel()
     {
+        var cleaner = new CleanerViewModel();
         Startup = new StartupViewModel();
+        Home = new HomeViewModel(cleaner, Navigate, Startup);
+
         NavigationItems =
         [
-            new("Nettoyage", "\uE74D", new CleanerViewModel()),
-            new("Démarrage", "\uE7E8", Startup),
-            new("Réglages Windows", "\uE713", new TweaksViewModel()),
-            new("Paramètres", "\uE115", new SettingsViewModel()),
+            new("Accueil", "", Home),
+            new("Nettoyage", "", cleaner),
+            new("Démarrage", "", Startup),
+            new("Réglages Windows", "", new TweaksViewModel()),
+            new("Paramètres", "", new SettingsViewModel()),
         ];
         _selectedItem = NavigationItems[0];
+        Home.Refresh();
         IsAdministrator = CheckAdministrator();
     }
 
     public IReadOnlyList<NavigationItem> NavigationItems { get; }
+
+    public HomeViewModel Home { get; }
 
     public StartupViewModel Startup { get; }
 
@@ -34,6 +41,9 @@ public sealed class MainViewModel : ObservableObject
         {
             if (!SetProperty(ref _selectedItem, value))
                 return;
+
+            if (value.Page == Home)
+                Home.Refresh();
 
             // La liste de démarrage n'est chargée qu'à la première visite.
             if (value.Page == Startup && Startup.Items.Count == 0 && Startup.RefreshCommand.CanExecute(null))
@@ -48,6 +58,13 @@ public sealed class MainViewModel : ObservableObject
     public string Version => AppInfo.Version;
 
     public string WindowTitle => AppInfo.Title;
+
+    private void Navigate(object page)
+    {
+        var item = NavigationItems.FirstOrDefault(i => i.Page == page);
+        if (item is not null)
+            SelectedItem = item;
+    }
 
     private static bool CheckAdministrator()
     {

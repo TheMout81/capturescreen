@@ -23,6 +23,24 @@ internal static class NativeMethods
     [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
     internal static extern int SHEmptyRecycleBin(IntPtr hwnd, string? pszRootPath, uint dwFlags);
 
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct MEMORYSTATUSEX
+    {
+        public uint dwLength;
+        public uint dwMemoryLoad;
+        public ulong ullTotalPhys;
+        public ulong ullAvailPhys;
+        public ulong ullTotalPageFile;
+        public ulong ullAvailPageFile;
+        public ulong ullTotalVirtual;
+        public ulong ullAvailVirtual;
+        public ulong ullAvailExtendedVirtual;
+    }
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool GlobalMemoryStatusEx(ref MEMORYSTATUSEX lpBuffer);
+
     [DllImport("dnsapi.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool DnsFlushResolverCache();

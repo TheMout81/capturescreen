@@ -1,0 +1,133 @@
+<UserControl x:Class="PureClean.Views.HomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PureClean.ViewModels">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,-16,0" Padding="0,0,16,0">
+        <StackPanel>
+            <TextBlock Text="Accueil" Style="{StaticResource PageTitle}" />
+            <TextBlock Style="{StaticResource PageSubtitle}">
+                <Run Text="{Binding WindowsVersion, Mode=OneWay}" />
+                <Run Text=" · " />
+                <Run Text="{Binding Uptime, Mode=OneWay}" />
+            </TextBlock>
+
+            <!-- Nettoyage rapide -->
+            <Border Style="{StaticResource Card}" Margin="0,20,0,0" Padding="24,20">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Espace libéré par PureClean" Style="{StaticResource ItemDescription}" Margin="0" />
+                        <TextBlock Text="{Binding TotalFreed}" FontSize="32" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" />
+                        <TextBlock Text="{Binding LastClean}" Style="{StaticResource ItemDescription}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">
+                        <Button Style="{StaticResource PrimaryButton}" Command="{Binding QuickCleanCommand}" Padding="28,12" Margin="0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE74D;" Style="{StaticResource Glyph}" Margin="0,0,10,0" />
+                                <TextBlock Text="Nettoyage rapide" FontSize="15" />
+                            </StackPanel>
+                        </Button>
+                        <Button Content="{Binding SelectionText}" Style="{StaticResource LinkButton}" Command="{Binding GoToCleanerCommand}"
+                                HorizontalAlignment="Center" Margin="0,8,0,0" ToolTip="Modifier la sélection" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Disques -->
+                <StackPanel>
+                    <TextBlock Text="DISQUES" Style="{StaticResource SectionTitle}" />
+                    <ItemsControl ItemsSource="{Binding Drives}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:DriveViewModel}">
+                                <Border Style="{StaticResource Row}" Padding="16,12">
+                                    <StackPanel>
+                                        <DockPanel>
+                                            <TextBlock DockPanel.Dock="Right" Text="{Binding Summary}" Style="{StaticResource ItemDescription}" Margin="0" />
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="&#xEDA2;" Style="{StaticResource Glyph}" Foreground="{DynamicResource MutedTextBrush}" Margin="0,0,8,0" />
+                                                <TextBlock Text="{Binding Name}" Style="{StaticResource ItemTitle}" />
+                                                <TextBlock Text="{Binding Label}" Style="{StaticResource ItemDescription}" Margin="8,0,0,0" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </DockPanel>
+                                        <ProgressBar Value="{Binding UsedPercent, Mode=OneWay}" Maximum="100" Margin="0,10,0,0" Height="8">
+                                            <ProgressBar.Style>
+                                                <Style TargetType="ProgressBar" BasedOn="{StaticResource {x:Type ProgressBar}}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsLow}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ProgressBar.Style>
+                                        </ProgressBar>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <!-- Mémoire et démarrage -->
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="SYSTÈME" Style="{StaticResource SectionTitle}" />
+                    <Border Style="{StaticResource Row}" Padding="16,12">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE950;" Style="{StaticResource Glyph}" Foreground="{DynamicResource MutedTextBrush}" Margin="0,0,8,0" />
+                                <TextBlock Text="Mémoire" Style="{StaticResource ItemTitle}" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding MemoryText}" Style="{StaticResource ItemDescription}" />
+                            <ProgressBar Value="{Binding MemoryPercent, Mode=OneWay}" Maximum="100" Margin="0,8,0,0" Height="8" />
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Row}" Padding="16,12">
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="Gérer" Style="{StaticResource LinkButton}" Margin="0"
+                                    VerticalAlignment="Center" Command="{Binding GoToStartupCommand}" />
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE7E8;" Style="{StaticResource Glyph}" Foreground="{DynamicResource MutedTextBrush}" Margin="0,0,8,0" />
+                                    <TextBlock Text="Démarrage" Style="{StaticResource ItemTitle}" />
+                                </StackPanel>
+                                <TextBlock Text="{Binding StartupText}" Style="{StaticResource ItemDescription}" />
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- Historique -->
+            <StackPanel Visibility="{Binding HasHistory, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,16">
+                <TextBlock Text="DERNIERS NETTOYAGES" Style="{StaticResource SectionTitle}" />
+                <ItemsControl ItemsSource="{Binding History}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:HistoryViewModel}">
+                            <Border Style="{StaticResource Row}" Padding="16,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="120" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Date}" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Kind}" Style="{StaticResource ItemDescription}" Margin="0" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="2" Text="{Binding Freed}" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

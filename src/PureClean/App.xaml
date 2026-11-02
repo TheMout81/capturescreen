@@ -12,6 +12,9 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Chaque ViewModel de page est affiché par sa vue. -->
+            <DataTemplate DataType="{x:Type vm:HomeViewModel}">
+                <views:HomeView />
+            </DataTemplate>
             <DataTemplate DataType="{x:Type vm:CleanerViewModel}">
                 <views:CleanerView />
             </DataTemplate>
