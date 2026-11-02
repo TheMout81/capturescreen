@@ -10,21 +10,12 @@ public enum ThemeMode
     Dark,
 }
 
-public sealed class CleanHistoryEntry
-{
-    public DateTime Date { get; set; }
-    public long BytesFreed { get; set; }
-    public int FilesDeleted { get; set; }
-    public bool Automatic { get; set; }
-}
-
 /// <summary>
 /// Préférences de l'utilisateur, stockées uniquement sur ce PC :
 /// %LOCALAPPDATA%\PureClean\settings.json.
 /// </summary>
 public sealed class AppSettings
 {
-    private const int MaxHistory = 100;
     private static readonly object Gate = new();
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -57,29 +48,7 @@ public sealed class AppSettings
     /// <summary>Dossiers ajoutés par l'utilisateur dont le contenu est vidé au nettoyage.</summary>
     public List<string> CustomFolders { get; set; } = [];
 
-    public long TotalBytesFreed { get; set; }
-
-    public List<CleanHistoryEntry> History { get; set; } = [];
-
     public ScheduleSettings Schedule { get; set; } = new();
-
-    public void RecordClean(long bytesFreed, int filesDeleted, bool automatic)
-    {
-        lock (Gate)
-        {
-            TotalBytesFreed += bytesFreed;
-            History.Insert(0, new CleanHistoryEntry
-            {
-                Date = DateTime.Now,
-                BytesFreed = bytesFreed,
-                FilesDeleted = filesDeleted,
-                Automatic = automatic,
-            });
-            if (History.Count > MaxHistory)
-                History.RemoveRange(MaxHistory, History.Count - MaxHistory);
-        }
-        Save();
-    }
 
     public void Save()
     {

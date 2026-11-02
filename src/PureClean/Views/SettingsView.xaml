@@ -30,6 +30,45 @@
                     </StackPanel>
                 </Border>
 
+                <!-- Nettoyage automatique -->
+                <TextBlock Text="NETTOYAGE AUTOMATIQUE" Style="{StaticResource SectionTitle}" />
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <DockPanel>
+                            <CheckBox DockPanel.Dock="Right" Style="{StaticResource Switch}" IsChecked="{Binding ScheduleEnabled}" />
+                            <StackPanel>
+                                <TextBlock Text="Nettoyer automatiquement" Style="{StaticResource ItemTitle}" />
+                                <TextBlock Style="{StaticResource ItemDescription}" MaxWidth="600" HorizontalAlignment="Left"
+                                           Text="Le Planificateur de tâches de Windows lance PureClean sans fenêtre : il nettoie les éléments cochés dans la page Nettoyage (sauf le nettoyage avancé) puis se ferme. Sur un portable, uniquement sur secteur." />
+                            </StackPanel>
+                        </DockPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,14,0,0" IsEnabled="{Binding ScheduleEnabled}">
+                            <RadioButton Style="{StaticResource PillRadio}" Content="Chaque jour" GroupName="Frequency"
+                                         IsChecked="{Binding Frequency, Converter={StaticResource Equals}, ConverterParameter=Daily}" />
+                            <RadioButton Style="{StaticResource PillRadio}" Content="Chaque semaine" GroupName="Frequency"
+                                         IsChecked="{Binding Frequency, Converter={StaticResource Equals}, ConverterParameter=Weekly}" />
+                            <RadioButton Style="{StaticResource PillRadio}" Content="Chaque mois" GroupName="Frequency"
+                                         IsChecked="{Binding Frequency, Converter={StaticResource Equals}, ConverterParameter=Monthly}" />
+                            <ComboBox ItemsSource="{Binding DayOptions}" SelectedItem="{Binding SelectedDay}" Width="130" Margin="12,0,0,0"
+                                      Visibility="{Binding IsWeekly, Converter={StaticResource BoolToVisibility}}" />
+                            <TextBlock Text="à" Style="{StaticResource ItemDescription}" VerticalAlignment="Center" Margin="12,0,8,0" />
+                            <ComboBox ItemsSource="{Binding HourOptions}" SelectedItem="{Binding SelectedHour}" Width="80" MaxDropDownHeight="260" />
+                        </StackPanel>
+
+                        <DockPanel Margin="0,14,0,0">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <Button Content="Voir le journal" Style="{StaticResource LinkButton}" Command="{Binding OpenLogCommand}" VerticalAlignment="Center" />
+                                <Button Content="Lancer maintenant" Style="{StaticResource SecondaryButton}" Command="{Binding RunNowCommand}" />
+                                <Button Content="Enregistrer" Style="{StaticResource PrimaryButton}" Command="{Binding SaveScheduleCommand}" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding ScheduleStatus}" Style="{StaticResource ItemDescription}" VerticalAlignment="Center" Margin="0" />
+                        </DockPanel>
+                        <TextBlock Style="{StaticResource ItemDescription}" Margin="0,8,0,0" FontStyle="Italic"
+                                   Text="Si vous déplacez PureClean.exe, cliquez à nouveau sur « Enregistrer »." />
+                    </StackPanel>
+                </Border>
+
                 <!-- Données -->
                 <TextBlock Text="DONNÉES" Style="{StaticResource SectionTitle}" />
                 <Border Style="{StaticResource Card}">

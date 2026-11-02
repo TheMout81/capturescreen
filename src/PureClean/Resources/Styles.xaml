@@ -358,7 +358,7 @@
                         <ContentPresenter Margin="10,0,28,0" VerticalAlignment="Center" IsHitTestVisible="False"
                                           Content="{TemplateBinding SelectionBoxItem}"
                                           ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" />
-                        <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" AllowsTransparency="True"
+                        <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" AllowsTransparency="True"
                                Focusable="False" PopupAnimation="Fade">
                             <Border MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
                                     MaxHeight="{TemplateBinding MaxDropDownHeight}" Margin="0,4,0,0"
@@ -514,7 +514,7 @@
                                 </Grid.ColumnDefinitions>
                                 <ToggleButton x:Name="Expander" Style="{StaticResource ExpanderToggle}"
                                               IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" />
-                                <ContentPresenter Grid.Column="1" ContentSource="Header" />
+                                <ContentPresenter x:Name="PART_Header" Grid.Column="1" ContentSource="Header" />
                             </Grid>
                         </Border>
                         <ItemsPresenter x:Name="ItemsHost" Margin="18,0,0,0" />

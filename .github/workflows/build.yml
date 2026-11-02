@@ -23,6 +23,9 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      - name: Vérifier le XAML (erreurs visibles seulement au lancement)
+        run: python tools/check_xaml.py
+
       - name: Compiler
         run: dotnet build PureClean.sln -c Release
 

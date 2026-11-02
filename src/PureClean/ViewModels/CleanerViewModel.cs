@@ -244,7 +244,7 @@ public sealed class CleanerViewModel : ObservableObject
         });
 
         if (total.BytesFreed > 0 || total.FilesDeleted > 0)
-            _settings.RecordClean(total.BytesFreed, total.FilesDeleted, automatic: false);
+            CleanHistory.Record(total.BytesFreed, total.FilesDeleted, automatic: false);
 
         SummaryText = $"{ByteFormatter.Format(total.BytesFreed)} libérés";
         StatusText = (completed ? "Nettoyage terminé" : "Nettoyage interrompu") +

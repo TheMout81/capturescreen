@@ -1,50 +1,67 @@
 # PureClean
 
-Nettoyeur et optimiseur pour Windows 10 / 11, dans l'esprit de CCleaner, **sans publicité, sans abonnement, sans télémétrie et sans aucune connexion réseau**.
+Nettoyeur et optimiseur pour Windows 10 / 11, dans l'esprit de CCleaner, **sans publicité, sans abonnement et sans télémétrie**.
 
 - Aucune dépendance externe : uniquement .NET 8 et les API de Windows.
-- Aucune requête réseau : l'application ne contacte aucun serveur, jamais.
-- Pas de « version Pro », pas de surveillance en arrière-plan, pas de mise à jour forcée.
+- PureClean n'envoie aucune donnée. Seule la page « Mises à jour » utilise Internet, via winget (l'outil officiel de Microsoft), et uniquement quand vous le demandez.
+- Pas de « version Pro », pas de programme résident, pas de mise à jour forcée.
+- Thème clair, sombre ou selon Windows.
 
 ## Fonctionnalités
 
+### Accueil
+Version de Windows, espace libre de chaque disque (en orange sous 10 %), mémoire utilisée, programmes actifs au démarrage, total libéré et derniers nettoyages. Le bouton **Nettoyage rapide** analyse votre sélection habituelle, annonce le gain, puis nettoie après confirmation.
+
 ### Nettoyage
-L'analyse ne supprime rien : elle indique l'espace récupérable par élément. Le nettoyage demande confirmation.
+L'analyse ne supprime rien. Le nettoyage demande confirmation. Les cases cochées sont mémorisées.
 
-| Windows | Applications et navigateurs |
+| Section | Contenu |
 |---|---|
-| Fichiers temporaires utilisateur et système (plus de 24 h) | Chrome, Edge, Brave, Vivaldi, Opera : caches web, code et GPU de tous les profils |
-| Corbeille | Firefox : cache de tous les profils |
-| Cache de Windows Update | Discord, Visual Studio Code, Teams (classique) |
-| Cache d'optimisation de distribution | Spotify (cache de lecture), Steam (cache web) |
-| Rapports d'erreurs (WER), vidages mémoire | |
-| Anciens journaux CBS / DISM | |
-| Cache des miniatures, documents récents, cache DNS *(décochés par défaut)* | |
+| Windows | Fichiers temporaires (plus de 24 h), corbeille, cache Windows Update, optimisation de distribution, rapports d'erreurs, vidages mémoire, anciens journaux ; miniatures, documents récents, cache DNS *(décochés par défaut)* |
+| Applications | Caches de Chrome, Edge, Brave, Vivaldi, Opera, Firefox (tous les profils), Discord, VS Code, Teams, Spotify, Steam |
+| Confidentialité *(jamais cochée par défaut)* | Historique et cookies des navigateurs Chromium, cookies de Firefox. Refusé tant que le navigateur est ouvert. Mots de passe et favoris jamais touchés. |
+| Nettoyage avancé *(jamais coché par défaut)* | Anciennes installations de Windows (`Windows.old`), composants obsolètes (DISM), anciens points de restauration (le plus récent est conservé) |
+| Mes dossiers | Vos propres dossiers à vider. Racines de disque, dossiers de Windows et dossiers personnels sont refusés. |
 
-Seules les applications réellement installées sont affichées. Si un programme concerné est ouvert, PureClean le signale avant de nettoyer.
+### Analyse disque
+Arborescence à la manière de TreeSize : chaque dossier avec sa taille, sa part du dossier parent et son nombre de fichiers, plus la liste des 200 plus gros fichiers. Ouverture dans l'Explorateur et envoi à la corbeille. Les liens et jonctions ne sont pas suivis, et les fichiers OneDrive stockés uniquement en ligne ne sont pas comptés.
+
+### Doublons
+Fichiers au contenu strictement identique : comparaison par taille, puis par empreinte du début et de la fin, puis par empreinte SHA-256 complète. Sélection automatique (garder le plus ancien ou le plus récent). Il est impossible de supprimer tous les exemplaires d'un même fichier. Les dossiers de Windows, des programmes, `AppData` et `.git` sont exclus.
+
+### Programmes
+Logiciels installés, avec recherche et tri par nom, taille ou date. La désinstallation lance le programme officiel de l'éditeur.
+
+### Mises à jour
+Liste des logiciels ayant une nouvelle version (via winget), avec un bouton par logiciel et **Tout mettre à jour**.
 
 ### Démarrage
-Liste les programmes lancés au démarrage (registre, dossiers Démarrage) et les tâches planifiées tierces, avec un interrupteur pour chacun.
-La désactivation utilise le même mécanisme que le Gestionnaire des tâches (clés `StartupApproved`) : rien n'est supprimé, tout est réversible. Les tâches système de Microsoft ne sont pas affichées.
+Programmes lancés au démarrage et tâches planifiées tierces. La désactivation utilise le même mécanisme que le Gestionnaire des tâches : rien n'est supprimé.
 
 ### Réglages Windows
-Optimisations de confidentialité (télémétrie, identifiant publicitaire, publicités du menu Démarrer et de l'écran de verrouillage, recherche Bing, historique d'activités), de réactivité (délai au démarrage, animations, transparence, Game DVR, applications en arrière-plan) et de l'Explorateur (extensions, fichiers cachés).
-Chaque réglage mémorise la valeur Windows d'origine et peut être annulé. Un point de restauration système est proposé avant toute modification.
+Optimisations réversibles : confidentialité (télémétrie, publicités, recherche Bing…), réactivité (délai au démarrage, animations, Game DVR…) et Explorateur (extensions, fichiers cachés). Un point de restauration est proposé avant chaque modification.
+
+### Paramètres
+- Thème.
+- **Nettoyage automatique** quotidien, hebdomadaire ou mensuel : une tâche du Planificateur Windows lance `PureClean.exe --auto-clean`, qui nettoie sans fenêtre la sélection habituelle (sauf le nettoyage avancé), puis se ferme. Sur un portable, uniquement sur secteur. Un journal est disponible.
+- Accès aux données locales.
 
 ## Ce que PureClean ne fait volontairement pas
 
-- **Pas de « nettoyeur de registre »** : le gain est nul et le risque de casser Windows réel.
-- **Pas de suppression des cookies, mots de passe, historiques ou sessions** : vous resteriez connecté nulle part.
+- **Pas de « nettoyeur de registre »** : le gain est nul et le risque de casser Windows est réel.
+- **Pas d'« optimiseur de mémoire »** : vider la RAM ralentit le PC.
 - **Pas de désactivation de Windows Defender ni de Windows Update.**
-- **Pas de vidage du Prefetch** : il accélère le lancement des programmes ; le vider ralentit le PC.
+- **Pas de vidage du Prefetch** : il accélère le lancement des programmes.
 
 ## Installation
 
-1. Ouvrez l'onglet **Actions** du dépôt GitHub, choisissez la dernière exécution réussie de **Build** et téléchargez l'artefact **PureClean-win-x64-buildN** (N = numéro de la compilation) (ou la page **Releases** si une version a été publiée).
+1. Ouvrez l'onglet **Actions** du dépôt GitHub, choisissez la dernière exécution réussie de **Build** et téléchargez l'artefact **PureClean-win-x64-buildN** (N = numéro de la compilation).
 2. Décompressez et lancez `PureClean.exe`. Il est autonome : rien à installer.
 3. Windows demande les droits administrateur (nécessaires pour nettoyer `C:\Windows` et modifier les réglages système).
 
 L'exécutable n'est pas signé : SmartScreen peut afficher « Windows a protégé votre ordinateur ». Cliquez sur *Informations complémentaires* puis *Exécuter quand même*.
+
+Les préférences et l'historique sont stockés dans `%LOCALAPPDATA%\PureClean`.
 
 ## Compiler soi-même
 
@@ -60,25 +77,38 @@ Exécutable autonome en un seul fichier :
 dotnet publish src/PureClean/PureClean.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish
 ```
 
+Vérification des erreurs XAML invisibles à la compilation (ressources manquantes, liaisons impossibles) :
+
+```bash
+python tools/check_xaml.py
+```
+
 ## Architecture
 
 ```
 src/PureClean/
 ├── Core/
-│   ├── CleanerCatalog.cs       Liste de tout ce qui est nettoyable
+│   ├── CleanerCatalog.cs       Tout ce qui est nettoyable
 │   ├── PathCleaner.cs          Nettoyeur générique basé sur des dossiers
-│   ├── Cleaners/               Cas particuliers (corbeille, DNS)
+│   ├── AutoClean.cs            Nettoyage planifié sans fenêtre
+│   ├── Cleaners/               Corbeille, DNS, nettoyages avancés
+│   ├── DiskAnalysis/           Analyse de l'espace disque
+│   ├── Duplicates/             Recherche de doublons
+│   ├── Programs/               Programmes installés
+│   ├── Updates/                Client winget
 │   ├── Startup/                Programmes et tâches au démarrage
 │   └── Tweaks/                 Réglages Windows réversibles
-├── Infrastructure/             Accès fichiers sécurisé, P/Invoke, MVVM
+├── Infrastructure/             Fichiers, corbeille, paramètres, thème, P/Invoke, MVVM
+├── Resources/                  Styles, thèmes clair/sombre, icône
 ├── ViewModels/                 Logique de l'interface
-└── Views/                      Interface WPF
+└── Views/                      Pages WPF
 ```
 
-### Sécurité du nettoyage
+### Sécurité
 - Les liens symboliques et jonctions ne sont **jamais suivis** : impossible de sortir du dossier ciblé.
-- Les fichiers verrouillés sont ignorés sans erreur ; les fichiers temporaires récents (moins de 24 h) sont conservés.
+- Les fichiers verrouillés sont ignorés sans erreur, et les fichiers temporaires récents (moins de 24 h) sont conservés.
 - Seul le contenu des dossiers ciblés est supprimé, jamais les dossiers eux-mêmes.
+- Les suppressions faites depuis l'analyse disque et les doublons passent par la corbeille. Windows prévient si un élément est trop gros pour y aller.
 
 ### Ajouter un élément à nettoyer
 Ajoutez une entrée dans `Core/CleanerCatalog.cs` :

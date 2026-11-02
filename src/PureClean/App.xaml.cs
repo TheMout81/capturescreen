@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Win32;
+using PureClean.Core;
 using PureClean.Infrastructure;
 
 namespace PureClean;
@@ -9,9 +10,18 @@ public partial class App : Application
 {
     protected override void OnStartup(StartupEventArgs e)
     {
-        DispatcherUnhandledException += OnUnhandledException;
         base.OnStartup(e);
 
+        // Lancé par le Planificateur de tâches : nettoyage sans fenêtre, puis fermeture.
+        if (e.Args.Contains(AutoClean.Argument, StringComparer.OrdinalIgnoreCase))
+        {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            Task.Run(() => AutoClean.Run(AppSettings.Current))
+                .ContinueWith(_ => Dispatcher.BeginInvoke(() => Shutdown()));
+            return;
+        }
+
+        DispatcherUnhandledException += OnUnhandledException;
         ThemeManager.Apply(AppSettings.Current.Theme);
         SystemEvents.UserPreferenceChanged += OnUserPreferenceChanged;
 

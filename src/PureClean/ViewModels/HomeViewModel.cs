@@ -109,14 +109,14 @@ public sealed class HomeViewModel : ObservableObject
         MemoryPercent = memory.UsedPercent;
         MemoryText = $"{ByteFormatter.Format((long)(memory.Total - memory.Available))} utilisés sur {ByteFormatter.Format((long)memory.Total)}";
 
-        var settings = AppSettings.Current;
-        TotalFreed = ByteFormatter.Format(settings.TotalBytesFreed);
-        LastClean = settings.History.Count == 0
+        var history = CleanHistory.Load();
+        TotalFreed = ByteFormatter.Format(history.TotalBytesFreed);
+        LastClean = history.Entries.Count == 0
             ? "Aucun nettoyage pour l'instant"
-            : "Dernier nettoyage : " + FormatDate(settings.History[0].Date);
+            : "Dernier nettoyage : " + FormatDate(history.Entries[0].Date);
 
         History.Clear();
-        foreach (var entry in settings.History.Take(5))
+        foreach (var entry in history.Entries.Take(5))
             History.Add(new HistoryViewModel(FormatDate(entry.Date), ByteFormatter.Format(entry.BytesFreed),
                 entry.Automatic ? "Automatique" : "Manuel"));
         OnPropertyChanged(nameof(HasHistory));
